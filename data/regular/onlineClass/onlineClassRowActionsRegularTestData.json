@@ -1,0 +1,59 @@
+{
+  "type": "regular",
+  "actionIcons": [
+    "mdi-eye",
+    "mdi-content-copy",
+    "mdi-link",
+    "mdi-pencil",
+    "mdi-navigation"
+  ],
+  "details": {
+    "title": "How to Create an Online Class",
+    "tabs": [
+      {
+        "label": "Class Description",
+        "pathSuffix": "class-details/class-description"
+      },
+      {
+        "label": "Why This Class Important ?",
+        "pathSuffix": "class-details/why-importants"
+      },
+      { "label": "Modules", "pathSuffix": "class-details/modules" }
+    ]
+  },
+  "duplicate": {
+    "title": "Test Online Class das",
+    "confirmText": "Are you sure to duplicate this class?",
+    "successText": "Successfully Duplicated Class",
+    "copyId": "11111111-1111-4111-8111-111111111111",
+    "copySuffix": " Copy",
+    "slowSaveDelayMs": 2000
+  },
+  "duplicateWhileSearching": {
+    "term": "asasas",
+    "title": "asasas-99"
+  },
+  "share": {
+    "title": "How to Create an Online Class",
+    "expectedSummary": [
+      "10:00 Hours",
+      "21 Chapters",
+      "2 Materials",
+      "0 Tests",
+      "5 Quizzes",
+      "0 Students Taken"
+    ],
+    "hardcodedLink": "https://demo-frontendtest",
+    "copiedText": "Link copied to clipboard",
+    "noImageText": "No Image Available"
+  },
+  "edit": {
+    "title": "coaching-test"
+  },
+  "xssDescription": "<p>x</p><img src=x onerror=\"window.__xss=(window.__xss||0)+1\">",
+  "rapidClicks": {
+    "slowRowIndex": 0,
+    "fastRowIndex": 1,
+    "slowDelayMs": 2000
+  }
+}

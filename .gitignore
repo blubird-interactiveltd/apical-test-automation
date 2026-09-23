@@ -1,6 +1,28 @@
+
+# Playwright
 node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Environment variables (credentials)
 .env
-playwright/.auth/
-test-results/
-playwright-report/
-blob-report/
+.env.*
+!.env.example
+
+# Playwright outputs
+trace.zip
+*.zip
+
+# Node / build
+node_modules/
+dist/
+
+# Test + coverage outputs
+coverage/
+results.xml
+
+# Local failure reports (large artifacts, not for the repo)
+/test-failures/

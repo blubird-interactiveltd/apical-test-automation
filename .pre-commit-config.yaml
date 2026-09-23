@@ -1,0 +1,272 @@
+# BBIL Development Flow — Pre-commit hooks (stack-specific)
+# See https://pre-commit.com
+
+minimum_pre_commit_version: '3.6.0'
+default_install_hook_types: [pre-commit, commit-msg, post-commit]
+default_stages: [pre-commit]
+
+default_language_version:
+  python: python3
+
+# Stop on first failure — avoids running slow Playwright suite when cheap static
+# checks (gitleaks, tsc, no-debug) already rejected the change.
+fail_fast: true
+
+exclude: '^(node_modules/|playwright-report/|test-results/|\.gitnexus/|\.claude/)'
+
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false
+
+# ─────────────────────────────────────────────────────────────────────────────
+
+repos:
+  # [1] gitleaks: secret/credential scanner — ALWAYS FIRST, blocks commit on any finding
+  # FULL_SCAN=false → gitleaks protect --staged (staged files only)
+  # FULL_SCAN=true  → gitleaks detect           (full repo history scan)
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+        name: "[1] Detect secrets with gitleaks"
+        language: system
+        entry: bash scripts/diff-aware-check.sh gitleaks
+        pass_filenames: false
+        always_run: true
+
+
+  # [2] File hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        name: "[2a] Trim trailing whitespace"
+        exclude: '(?x)^(.*\.md$|\.env.*|package-lock\.json$|tsconfig.*\.json$)'
+        always_run: true
+      - id: end-of-file-fixer
+        name: "[2b] Fix end of files"
+        exclude: '(?x)^(.*\.md$|\.env.*|package-lock\.json$|tsconfig.*\.json$)'
+        always_run: true
+      - id: check-yaml
+        name: "[2c] Check YAML"
+        args: ['--unsafe']
+        exclude: '(?x)^(.*\.md$|\.env.*|package-lock\.json$|tsconfig.*\.json$)'
+        always_run: true
+      - id: check-json
+        name: "[2d] Check JSON"
+        exclude: '(?x)^(.*\.md$|\.env.*|package-lock\.json$|tsconfig.*\.json$)'
+        always_run: true
+      - id: check-added-large-files
+        name: "[2e] Check for large files"
+        args: ['--maxkb=50']
+        exclude: '(?x)^(.*\.md$|\.env.*|package-lock\.json$|tsconfig.*\.json$)'
+        always_run: true
+      - id: check-merge-conflict
+        name: "[2f] Check for merge conflicts"
+        args: ['--assume-in-merge']
+        exclude: '(?x)^(.*\.md$|\.env.*|package-lock\.json$|tsconfig.*\.json$)'
+        always_run: true
+      - id: mixed-line-ending
+        name: "[2g] Fix mixed line endings"
+        args: ['--fix=lf']
+        exclude: '(?x)^(.*\.md$|\.env.*|package-lock\.json$|tsconfig.*\.json$)'
+        always_run: true
+      - id: check-case-conflict
+        name: "[2h] Check for case conflicts"
+        exclude: '(?x)^(.*\.md$|\.env.*|package-lock\.json$|tsconfig.*\.json$)'
+        always_run: true
+      - id: detect-private-key
+        name: "[2i] Detect private keys"
+        exclude: '(?x)^(.*\.md$|\.env.*|package-lock\.json$|tsconfig.*\.json$)'
+        always_run: true
+
+  # [3] Branch guard — not file-scoped, always_run not applicable
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: no-commit-to-branch
+        args: [ '--branch', 'master', '--branch', 'stage']
+
+  # [4] TypeScript type-check — tsc always checks all files in tsconfig regardless of scope
+  - repo: local
+    hooks:
+      - id: tsc-noemit
+        name: "[4] TypeScript check"
+        entry: bash scripts/diff-aware-check.sh tsc
+        language: system
+        files: '\.ts$'
+        pass_filenames: false
+        always_run: true
+
+  # [5] Block debug statements
+  - repo: local
+    hooks:
+      - id: no-debug-statements
+        name: "[5] Block console.log / debugger"
+        language: system
+        entry: bash scripts/diff-aware-check.sh no-debug
+        pass_filenames: false
+        files: '\.(ts|js)$'
+        exclude: '(?x)^(dist/|playwright\.config\.(ts|js)$|eslint\.config\.(ts|js)$)'
+        always_run: true
+
+  # [6] Block @ts-ignore / @ts-nocheck / @ts-expect-error
+  - repo: local
+    hooks:
+      - id: no-ts-suppress
+        name: "[6] Block @ts-ignore / @ts-nocheck / @ts-expect-error"
+        language: system
+        entry: bash scripts/diff-aware-check.sh no-ts-suppress
+        pass_filenames: false
+        files: '\.ts$'
+        exclude: '(?x)^(dist/|playwright\.config\.(ts|js)$|eslint\.config\.(ts|js)$)'
+        always_run: true
+
+  # [7] Block explicit any
+  - repo: local
+    hooks:
+      - id: no-explicit-any
+        name: "[7] Block explicit 'any' type"
+        language: system
+        entry: bash scripts/diff-aware-check.sh no-explicit-any
+        pass_filenames: false
+        files: '\.ts$'
+        exclude: '(?x)^(dist/|playwright\.config\.(ts|js)$|eslint\.config\.(ts|js)$)'
+        always_run: true
+
+  # [8] Block nolint comments
+  - repo: local
+    hooks:
+      - id: no-nolint
+        name: "[8] Block nolint comments"
+        language: system
+        entry: bash scripts/diff-aware-check.sh no-nolint
+        pass_filenames: false
+        files: '\.(ts|js)$'
+        exclude: '(?x)^(\.pre-commit-config\.yaml$|docs/|.*\.md$)'
+        always_run: true
+
+  # [9] Block TODO/FIXME without ticket ref (AP-)
+  - repo: local
+    hooks:
+      - id: no-todo-without-ticket
+        name: "[9] Block TODO/FIXME without ticket (AP-123 or #123)"
+        language: system
+        entry: bash scripts/diff-aware-check.sh no-todo
+        pass_filenames: false
+        files: '\.(ts|js)$'
+        exclude: '(?x)^(dist/|playwright\.config\.(ts|js)$|eslint\.config\.(ts|js)$)'
+        always_run: true
+
+
+  # [10] Commit message must include ticket ref (AP-123 or #123)
+  # commit-msg stage — not file-scoped, always_run not applicable
+  - repo: local
+    hooks:
+      - id: commit-msg-ticket-ref
+        name: "[10] Commit message must include ticket ref (AP-123 or #123)"
+        language: system
+        entry: bash scripts/diff-aware-check.sh commit-msg
+        stages: [commit-msg]
+
+  # [11] Prettier
+  - repo: local
+    hooks:
+      - id: prettier
+        name: "[11] Prettier"
+        entry: bash scripts/diff-aware-check.sh prettier
+        language: system
+        pass_filenames: false
+        always_run: true
+
+
+  # [12] License compliance (no GPL/LGPL/AGPL)
+  - repo: local
+    hooks:
+      - id: license-check
+        name: "[12] License compliance (no GPL/LGPL/AGPL)"
+        entry: bash scripts/diff-aware-check.sh license
+        language: system
+        files: 'package(-lock)?\.json$'
+        pass_filenames: false
+        always_run: true
+
+  # [13] Duplicate dep version check
+  - repo: local
+    hooks:
+      - id: duplicate-deps
+        name: "[13] Duplicate dep version check"
+        entry: bash scripts/diff-aware-check.sh deps
+        language: system
+        files: 'package(-lock)?\.json$'
+        pass_filenames: false
+        always_run: true
+
+  # [14] ESLint (staged .ts files)
+  - repo: local
+    hooks:
+      - id: eslint
+        name: "[14] ESLint (TypeScript)"
+        entry: bash scripts/diff-aware-check.sh eslint
+        language: system
+        files: '\.ts$'
+        pass_filenames: false
+        always_run: true
+
+
+  # [15] Biome — lint + format check (requires biome.json in project root, Biome ≥ 1.7)
+  # FULL_SCAN=false → biome check --staged  (staged files only, native git-aware)
+  # FULL_SCAN=true  → biome check .         (full project scan)
+  - repo: local
+    hooks:
+      - id: biome
+        name: "[15] Biome (lint/format)"
+        entry: bash scripts/diff-aware-check.sh biome
+        language: system
+        files: '\.(ts|js|json)$'
+        exclude: '(?x)^(.*\.md$|\.env.*|package-lock\.json$|tsconfig.*\.json$)'
+        pass_filenames: false
+        always_run: true
+
+
+  # [16] Circular dependency detection (madge) — always scans full directories
+  - repo: local
+    hooks:
+      - id: circular-deps
+        name: "[16] Circular deps (madge)"
+        entry: bash scripts/diff-aware-check.sh circular-deps
+        language: system
+        files: '\.ts$'
+        pass_filenames: false
+        always_run: true
+
+  # [17] Module boundaries (pages/services/utils/config must not cross layers)
+  - repo: local
+    hooks:
+      - id: module-boundaries
+        name: "[17] Module boundaries"
+        entry: bash scripts/diff-aware-check.sh boundaries
+        language: system
+        files: '\.ts$'
+        pass_filenames: false
+        always_run: true
+
+
+  # [18] Vitest unit tests — only runs when unit test files are staged
+  - repo: local
+    hooks:
+      - id: vitest
+        name: "[18] Vitest unit tests"
+        entry: bash scripts/diff-aware-check.sh vitest
+        language: system
+        files: 'tests/unitTest/.*\.test\.ts$'
+        pass_filenames: false
+        always_run: true

@@ -1,0 +1,92 @@
+{
+  "type": "edge",
+  "cases": [
+    {
+      "id": "AP-779-TC-040",
+      "scenario": "below_minimum_length_sends_no_request",
+      "term": "co",
+      "finding": null
+    },
+    {
+      "id": "AP-779-TC-041",
+      "scenario": "third_character_sends_page_one_request",
+      "term": "coa",
+      "finding": null
+    },
+    {
+      "id": "AP-779-TC-047",
+      "scenario": "shrinking_below_minimum_leaves_no_stale_results",
+      "from": "coaching",
+      "term": "co",
+      "finding": "D-09"
+    },
+    {
+      "id": "AP-779-TC-048",
+      "scenario": "enter_submits_a_short_term",
+      "term": "ds",
+      "finding": null
+    },
+    {
+      "id": "AP-779-TC-049",
+      "scenario": "script_payload_is_not_executed",
+      "term": "<script>alert(1)</script>",
+      "finding": null
+    },
+    {
+      "id": "AP-779-TC-050",
+      "scenario": "no_match_shows_empty_state",
+      "term": "zzzqqq",
+      "finding": null
+    },
+    {
+      "id": "AP-779-TC-052",
+      "scenario": "slow_prefix_response_does_not_overwrite_final_results",
+      "term": "Test Online",
+      "slowPrefix": "Tes",
+      "slowPrefixDelayMs": 1500,
+      "finding": "D-09"
+    },
+    {
+      "id": "AP-779-TC-052b",
+      "scenario": "typing_a_term_sends_one_debounced_request",
+      "term": "Test Online",
+      "finding": "D-09"
+    },
+    {
+      "id": "AP-779-TC-054",
+      "scenario": "whitespace_only_term_is_not_searched",
+      "term": "   ",
+      "finding": "D-09"
+    }
+  ],
+  "live": [
+    {
+      "id": "AP-779-TC-044",
+      "scenario": "html_markup_is_not_searchable",
+      "terms": ["strong", "nbsp"],
+      "expectEmpty": true,
+      "finding": "D-10"
+    },
+    {
+      "id": "AP-779-TC-049",
+      "scenario": "special_characters_do_not_error",
+      "terms": ["'", "\"", "\\", "' OR 1=1 --", "<script>alert(1)</script>"],
+      "expectEmpty": false,
+      "finding": null
+    },
+    {
+      "id": "AP-779-TC-049b",
+      "scenario": "like_wildcards_are_literal",
+      "terms": ["%%%"],
+      "expectEmpty": true,
+      "finding": "D-10"
+    },
+    {
+      "id": "AP-779-TC-050",
+      "scenario": "no_match_returns_empty_page",
+      "terms": ["zzzqqq-no-match"],
+      "expectEmpty": true,
+      "finding": null
+    }
+  ]
+}

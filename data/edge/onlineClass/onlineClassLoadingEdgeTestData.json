@@ -1,0 +1,42 @@
+{
+  "type": "edge",
+  "cases": [
+    {
+      "id": "AP-779-TC-011",
+      "scenario": "slow_list_shows_loader",
+      "status": 200,
+      "delayMs": 1500,
+      "finding": null
+    },
+    {
+      "id": "AP-779-TC-012",
+      "scenario": "server_error_is_handled",
+      "status": 500,
+      "delayMs": 0,
+      "finding": "D-06"
+    },
+    {
+      "id": "AP-779-TC-013",
+      "scenario": "empty_list_shows_empty_state",
+      "status": 200,
+      "delayMs": 0,
+      "finding": null
+    },
+    {
+      "id": "AP-779-TC-013b",
+      "scenario": "empty_state_message_is_meaningful",
+      "status": 200,
+      "delayMs": 0,
+      "forbiddenText": "undefined",
+      "finding": "D-20"
+    },
+    {
+      "id": "AP-779-TC-014",
+      "scenario": "expired_token_sends_user_to_login",
+      "status": 401,
+      "delayMs": 0,
+      "expectedUrl": "/login",
+      "finding": "D-21"
+    }
+  ]
+}

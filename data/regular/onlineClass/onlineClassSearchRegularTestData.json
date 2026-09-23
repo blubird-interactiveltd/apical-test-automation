@@ -1,0 +1,29 @@
+{
+  "type": "regular",
+  "cases": [
+    {
+      "id": "AP-779-TC-042",
+      "scenario": "matches_on_title",
+      "term": "coaching",
+      "expectedTitles": ["coaching-test-1", "coaching-test"]
+    },
+    {
+      "id": "AP-779-TC-043",
+      "scenario": "matches_on_description_text",
+      "term": "Maecenas",
+      "expectedTitles": ["New South Wales", "coaching-test-1", "coaching-test"]
+    },
+    {
+      "id": "AP-779-TC-045",
+      "scenario": "is_case_insensitive",
+      "term": "SDDS",
+      "expectedTitles": [
+        "sdds Copy",
+        "sdds Copy",
+        "sdds Copy",
+        "sdds Copy",
+        "sdds"
+      ]
+    }
+  ]
+}

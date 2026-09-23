@@ -1,0 +1,22 @@
+{
+  "type": "regular",
+  "singlePage": {
+    "id": "AP-779-TC-070",
+    "expectedLabel": "1 - 20 Of 20",
+    "finding": "D-03"
+  },
+  "multiPage": {
+    "id": "AP-779-TC-072",
+    "totalClasses": 45,
+    "perPage": 20,
+    "titlePrefix": "Class",
+    "steps": [
+      { "action": "next", "expectFirstTitle": "Class 021", "expectRows": 20 },
+      { "action": "next", "expectFirstTitle": "Class 041", "expectRows": 5 },
+      { "action": "prev", "expectFirstTitle": "Class 021", "expectRows": 20 }
+    ],
+    "finding": "D-02"
+  },
+  "searchResetsPage": { "id": "AP-779-TC-051", "term": "Cla" },
+  "searchKeptWhenPaging": { "id": "AP-779-TC-073", "term": "Class" }
+}
