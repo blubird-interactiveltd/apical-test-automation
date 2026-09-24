@@ -1,0 +1,604 @@
+# Apical Test Automation CI — Playwright (TypeScript)
+# Defense-in-depth: mirrors .pre-commit-config.yaml guards.
+# No `continue-on-error` on any quality step.
+
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    types: [opened, synchronize, edited, reopened]
+    branches: ['**']
+  workflow_dispatch:
+    inputs:
+      full_scan:
+        description: 'Scan entire codebase (not just PR diff)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+
+env:
+  NODE_VERSION: '20.19.2'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+
+  # ── [A] AI Guard ─────────────────────────────────────────────────────────────
+  ai-guard:
+    name: AI Guard
+    runs-on: self-hosted
+    if: github.event_name == 'pull_request'
+    outputs:
+      jira_ticket: ${{ steps.extract.outputs.jira_ticket }}
+      has_ticket:  ${{ steps.extract.outputs.has_ticket }}
+    steps:
+      # [3] Branch guard — mirrors pre-commit hook [3]
+      - name: "[3] Block PRs opened from protected branches (master/stage)"
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          case "$HEAD_REF" in
+            master|stage)
+              echo "::error::PRs from '$HEAD_REF' are not allowed. Work in a feature branch instead."
+              exit 1
+              ;;
+          esac
+          echo "Source branch '$HEAD_REF' is allowed."
+
+      - name: Validate PR body not empty
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          if [ -z "$PR_BODY" ]; then
+            echo "::error::PR description is required."
+            exit 1
+          fi
+
+      - name: Validate PR title (conventional commits + ticket ref)
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if ! echo "$PR_TITLE" | grep -qE \
+            '^(feat|fix|chore|refactor|docs|test|perf|ci|build|style)(\(.+\))?: .+'; then
+            echo "::error::PR title must follow conventional commits."
+            echo "::error::Example: feat(onlineClass): add list pagination test AP-123"
+            echo "::error::Types: feat|fix|chore|refactor|docs|test|perf|ci|build|style"
+            exit 1
+          fi
+          if ! echo "$PR_TITLE" | grep -qE '(AP-[0-9]+|#[0-9]+)'; then
+            echo "::error::PR title must reference a Jira ticket (AP-123) or GitHub issue (#123)."
+            exit 1
+          fi
+
+      - name: Extract Jira ticket or GitHub issue ref
+        id: extract
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          JIRA=$(echo "$PR_TITLE" | grep -oE '[A-Z]+-[0-9]+' | head -1 || true)
+          GH_ISSUE=$(echo "$PR_TITLE" | grep -oE '#[0-9]+' | head -1 || true)
+          if [ -n "$JIRA" ]; then
+            echo "has_ticket=true"   >> "$GITHUB_OUTPUT"
+            echo "jira_ticket=$JIRA" >> "$GITHUB_OUTPUT"
+            echo "Found Jira: $JIRA"
+          else
+            echo "has_ticket=false" >> "$GITHUB_OUTPUT"
+            echo "jira_ticket="     >> "$GITHUB_OUTPUT"
+            echo "Found GH issue: $GH_ISSUE"
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # [10] Commit message ticket ref — mirrors pre-commit hook [10]
+      - name: Validate commit messages include ticket ref
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if ! git cat-file -e "$PR_BASE_SHA^{commit}" 2>/dev/null; then
+            echo "::error::Base commit $PR_BASE_SHA not in local history — cannot validate commit messages."
+            exit 1
+          fi
+          MISSING=""
+          while IFS= read -r msg; do
+            if ! echo "$msg" | grep -qE '(AP-[0-9]+|#[0-9]+)'; then
+              MISSING="$MISSING\n  - $msg"
+            fi
+          done < <(git log --format="%s" "$PR_BASE_SHA".."$PR_HEAD_SHA")
+          if [ -n "$MISSING" ]; then
+            echo "::error::Commit messages missing ticket ref (AP-123 or #123):$MISSING"
+            exit 1
+          fi
+          echo "All commit messages contain a ticket ref."
+
+      - name: Post AI Bypass Guard comment
+        uses: actions/github-script@v7
+        env:
+          JIRA_API_URL:    ${{ secrets.JIRA_API_URL }}
+          JIRA_API_TOKEN:  ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+        with:
+          script: |
+            const hasTick = '${{ steps.extract.outputs.has_ticket }}';
+            const ticket  = '${{ steps.extract.outputs.jira_ticket }}';
+            const MARKER  = '<!-- ai-bypass-guard-comment -->';
+            let statusLine, actionLine;
+            if (hasTick !== 'true') {
+              statusLine = 'ℹ️ **GitHub issue ref found** — no Jira ticket.';
+              actionLine = 'Add a Jira ticket (e.g. `AP-123`) to enable AC validation.';
+            } else {
+              statusLine = `✅ **Jira ticket: \`${ticket}\`**`;
+              actionLine = 'Jira secrets not configured — manual review required.';
+              const { JIRA_API_URL: url, JIRA_API_TOKEN: tok, JIRA_USER_EMAIL: email } = process.env;
+              if (url && tok && email) {
+                try {
+                  const r = await fetch(`${url}/rest/api/3/issue/${ticket}`, {
+                    headers: { 'Authorization': 'Basic ' + Buffer.from(`${email}:${tok}`).toString('base64'), 'Accept': 'application/json' }
+                  });
+                  if (r.ok) { const d = await r.json(); actionLine = `**${ticket}:** ${d.fields?.summary || 'No summary'}`; }
+                } catch(_) {}
+              }
+            }
+            const prNum = context.payload.pull_request.number;
+            const { data: comments } = await github.rest.issues.listComments({ owner: context.repo.owner, repo: context.repo.repo, issue_number: prNum });
+            const existing = comments.find(c => c.body?.includes(MARKER));
+            const body = [MARKER, statusLine, '', actionLine].join('\n');
+            if (existing) {
+              await github.rest.issues.updateComment({ owner: context.repo.owner, repo: context.repo.repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: prNum, body });
+            }
+
+  # ── [B] PR Meta ───────────────────────────────────────────────────────────────
+  pr-meta:
+    name: PR Size Check
+    runs-on: self-hosted
+    needs: ai-guard
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const pr     = context.payload.pull_request;
+            const total  = pr.additions + pr.deletions;
+            const MARKER = '<!-- pr-size-comment -->';
+            if (total <= 500) return;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner, repo: context.repo.repo, issue_number: pr.number });
+            const existing = comments.find(c => c.body?.includes(MARKER));
+            const body = `${MARKER}\n## ⚠️ Large PR (${total} lines)\nThis PR has **${pr.additions} additions** and **${pr.deletions} deletions** across ${pr.changed_files} files.\nConsider splitting into smaller focused PRs.`;
+            if (existing) {
+              await github.rest.issues.updateComment({ owner: context.repo.owner, repo: context.repo.repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: pr.number, body });
+            }
+
+  # ── [B2] File Hygiene ─────────────────────────────────────────────────────────
+  # Mirrors pre-commit hooks [2a–2i]: whitespace, EOF, YAML/JSON, large files,
+  # merge-conflict markers, CRLF line endings, and private-key patterns.
+  file-hygiene:
+    name: File Hygiene
+    runs-on: self-hosted
+    needs: pr-meta
+    if: github.event_name == 'pull_request'
+    env:
+      BASE_REF: ${{ github.base_ref }}
+    steps:
+      # Preflight — the self-hosted runner image is minimal and ephemeral, so
+      # verify the tools [2c]/[2d] need each run and install only what is missing.
+      - name: Preflight — ensure python3 + PyYAML
+        run: |
+          SUDO=""
+          if [ "$(id -u)" -ne 0 ]; then SUDO="sudo"; fi
+          if ! command -v python3 >/dev/null 2>&1; then
+            echo "python3 not found — installing"
+            $SUDO apt-get update -qq
+            $SUDO apt-get install -y -qq python3
+          fi
+          if ! python3 -c "import yaml" 2>/dev/null; then
+            echo "PyYAML not found — installing"
+            $SUDO apt-get update -qq
+            $SUDO apt-get install -y -qq python3-yaml \
+              || python3 -m pip install --quiet --break-system-packages pyyaml
+          fi
+          python3 --version
+          python3 -c "import yaml; print('PyYAML', yaml.__version__)"
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve changed files
+        id: files
+        run: |
+          git fetch origin "$BASE_REF" --depth=50 2>/dev/null || true
+          FILES=$(git diff --name-only "origin/$BASE_REF"...HEAD 2>/dev/null \
+            | grep -vE '^(node_modules/|playwright-report/|test-results/|\.gitnexus/|\.claude/|dist/|.*\.md$|\.env.*|package-lock\.json$|tsconfig.*\.json$)' \
+            | grep -vE '\.(jpe?g|png|gif|webp|avif|ico|pdf|woff2?|ttf|eot|zip|mp4|webm)$' \
+            || true)
+          echo "files<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$FILES"     >> "$GITHUB_OUTPUT"
+          echo "EOF"        >> "$GITHUB_OUTPUT"
+
+      # [2a] Trailing whitespace
+      - name: "[2a] Trailing whitespace"
+        run: |
+          FILES="${{ steps.files.outputs.files }}"
+          if [ -z "$FILES" ]; then echo "No files — skip"; exit 0; fi
+          HITS=$(echo "$FILES" | xargs grep -lP ' +$' 2>/dev/null || true)
+          if [ -n "$HITS" ]; then echo "::error::Trailing whitespace in: $HITS"; exit 1; fi
+          echo "OK"
+
+      # [2b] End-of-file newline
+      - name: "[2b] Missing newline at end of file"
+        run: |
+          FILES="${{ steps.files.outputs.files }}"
+          if [ -z "$FILES" ]; then echo "No files — skip"; exit 0; fi
+          MISSING=""
+          while IFS= read -r f; do
+            [ -f "$f" ] || continue
+            if [ -s "$f" ] && [ "$(tail -c1 "$f" | wc -l)" -eq 0 ]; then
+              MISSING="$MISSING $f"
+            fi
+          done <<< "$FILES"
+          if [ -n "$MISSING" ]; then echo "::error::No newline at EOF:$MISSING"; exit 1; fi
+          echo "OK"
+
+      # [2c] YAML validity
+      - name: "[2c] YAML validity"
+        run: |
+          FILES=$(echo "${{ steps.files.outputs.files }}" | grep -E '\.ya?ml$' || true)
+          if [ -z "$FILES" ]; then echo "No YAML files — skip"; exit 0; fi
+          FAILED=""
+          while IFS= read -r f; do
+            [ -f "$f" ] || continue
+            python3 -c "import yaml; yaml.load(open('$f', encoding='utf-8'), Loader=yaml.UnsafeLoader)" \
+              || FAILED="$FAILED $f"
+          done <<< "$FILES"
+          if [ -n "$FAILED" ]; then echo "::error::Invalid YAML:$FAILED"; exit 1; fi
+          echo "OK"
+
+      # [2d] JSON validity
+      - name: "[2d] JSON validity"
+        run: |
+          FILES=$(echo "${{ steps.files.outputs.files }}" | grep -E '\.json$' | grep -v 'package-lock' || true)
+          if [ -z "$FILES" ]; then echo "No JSON files — skip"; exit 0; fi
+          FAILED=""
+          while IFS= read -r f; do
+            [ -f "$f" ] || continue
+            python3 -m json.tool "$f" > /dev/null || FAILED="$FAILED $f"
+          done <<< "$FILES"
+          if [ -n "$FAILED" ]; then echo "::error::Invalid JSON:$FAILED"; exit 1; fi
+          echo "OK"
+
+      # [2e] Large files (>50 KB)
+      - name: "[2e] Large files (>50 KB)"
+        run: |
+          FILES="${{ steps.files.outputs.files }}"
+          if [ -z "$FILES" ]; then echo "No files — skip"; exit 0; fi
+          LARGE=""
+          while IFS= read -r f; do
+            [ -f "$f" ] || continue
+            sz=$(stat -c%s "$f" 2>/dev/null || stat -f%z "$f" 2>/dev/null || echo 0)
+            if [ "$sz" -gt 51200 ]; then LARGE="$LARGE $f($sz bytes)"; fi
+          done <<< "$FILES"
+          if [ -n "$LARGE" ]; then echo "::error::Files exceed 50 KB:$LARGE"; exit 1; fi
+          echo "OK"
+
+      # [2f] Merge conflict markers
+      - name: "[2f] Merge conflict markers"
+        run: |
+          FILES="${{ steps.files.outputs.files }}"
+          if [ -z "$FILES" ]; then echo "No files — skip"; exit 0; fi
+          HITS=$(echo "$FILES" | xargs grep -lE '^(<{7}|>{7}|={7}|\|{7})' 2>/dev/null || true)
+          if [ -n "$HITS" ]; then echo "::error::Merge conflict markers in: $HITS"; exit 1; fi
+          echo "OK"
+
+      # [2g] CRLF line endings
+      - name: "[2g] CRLF line endings"
+        run: |
+          FILES=$(echo "${{ steps.files.outputs.files }}" | grep -E '\.(ts|js|json|yaml|yml|md|sh)$' || true)
+          if [ -z "$FILES" ]; then echo "No files — skip"; exit 0; fi
+          HITS=$(echo "$FILES" | xargs grep -lP '\r$' 2>/dev/null || true)
+          if [ -n "$HITS" ]; then echo "::error::CRLF line endings in: $HITS"; exit 1; fi
+          echo "OK"
+
+      # [2h] Case conflicts (duplicate filenames differing only by case)
+      - name: "[2h] Case conflicts"
+        run: |
+          DUPES=$(git ls-files | sort -f | uniq -di || true)
+          if [ -n "$DUPES" ]; then echo "::error::Case conflicts: $DUPES"; exit 1; fi
+          echo "OK"
+
+      # [2i] Private key patterns
+      - name: "[2i] Private key patterns"
+        run: |
+          FILES="${{ steps.files.outputs.files }}"
+          if [ -z "$FILES" ]; then echo "No files — skip"; exit 0; fi
+          HITS=$(echo "$FILES" | xargs grep -lE '-----BEGIN (RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY' 2>/dev/null || true)
+          if [ -n "$HITS" ]; then echo "::error::Private key found in: $HITS"; exit 1; fi
+          echo "OK"
+
+  # ── [C] Security ──────────────────────────────────────────────────────────────
+  security:
+    name: Security Scan
+    runs-on: self-hosted
+    needs: pr-meta
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: npm install --ignore-scripts
+      - name: npm audit
+        run: npm audit --audit-level=high
+      - name: Gitleaks secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN:     ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+          # The runner's HOME (/root) is not a parent of the workspace, so the
+          # action's SARIF artifact upload throws. The scan itself is unaffected.
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
+      - name: Block .env files in diff
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          git fetch origin "$BASE_REF" --depth=50 2>/dev/null || true
+          ENV_FILES=$(git diff --name-only "origin/$BASE_REF"...HEAD 2>/dev/null | grep -E '\.env$' | grep -v '\.env\.example' || true)
+          if [ -n "$ENV_FILES" ]; then echo "::error::.env in diff: $ENV_FILES"; exit 1; fi
+      - name: Check --no-verify bypass in commits
+        run: |
+          BYPASS=$(git log --oneline -20 | grep -E '\-\-no\-verify|SKIP=' || true)
+          if [ -n "$BYPASS" ]; then echo "::warning::Hook bypass detected: $BYPASS"; fi
+
+  # ── [D] Static Checks ─────────────────────────────────────────────────────────
+  static-checks:
+    name: Static Checks
+    runs-on: self-hosted
+    needs: [security, file-hygiene]
+    if: github.event_name == 'pull_request'
+    env:
+      BASE_REF: ${{ github.base_ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - run: npm install --ignore-scripts
+
+      # [4] TypeScript check — mirrors pre-commit hook [4]
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      # [11] Prettier format check — mirrors pre-commit hook [11]
+      - name: Prettier format check
+        run: |
+          npx prettier --check \
+            --ignore-path .gitignore \
+            "**/*.{ts,js,json,md}" \
+            "!node_modules/**" \
+            "!dist/**" \
+            "!playwright-report/**" \
+            "!test-results/**" \
+            "!.gitnexus/**" \
+            "!.claude/**" \
+            "!package-lock.json"
+
+      # [14] ESLint — mirrors pre-commit hook [14]
+      - name: ESLint
+        run: |
+          FILES=$(git diff --name-only "origin/$BASE_REF"...HEAD 2>/dev/null | grep '\.ts$' | grep -vE '^(node_modules/|dist/|\.gitnexus/|\.claude/)' || true)
+          EXISTING=$(echo "$FILES" | while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done || true)
+          if [ -n "$EXISTING" ]; then
+            echo "$EXISTING" | xargs -n 50 ./node_modules/.bin/eslint --max-warnings=0 --no-warn-ignored
+          else
+            echo "No .ts files — skipping ESLint"
+          fi
+
+      # [5] Block debug statements — mirrors pre-commit hook [5]
+      - name: Block debug statements
+        run: |
+          FILES=$(git diff --name-only "origin/$BASE_REF"...HEAD 2>/dev/null | grep -E '\.(ts|js)$' | grep -vE '^(node_modules/|dist/|\.gitnexus/|\.claude/)' | grep -vE 'playwright\.config\.(ts|js)$|eslint\.config\.(ts|js)$' || true)
+          if [ -n "$FILES" ]; then
+            HITS=$(echo "$FILES" | xargs grep -lP 'console\.(log|warn|error|debug|info)\s*\(|\bdebugger\b' 2>/dev/null || true)
+            if [ -n "$HITS" ]; then echo "::error::Debug statements found in: $HITS"; exit 1; fi
+          fi
+          echo "No debug statements found"
+
+      # [6] Block @ts-ignore / @ts-nocheck / @ts-expect-error — mirrors pre-commit hook [6]
+      - name: Block @ts-ignore / @ts-nocheck / @ts-expect-error
+        run: |
+          FILES=$(git diff --name-only "origin/$BASE_REF"...HEAD 2>/dev/null | grep -E '\.ts$' | grep -vE '^(node_modules/|dist/|\.gitnexus/|\.claude/)' | grep -vE 'playwright\.config\.(ts|js)$|eslint\.config\.(ts|js)$' || true)
+          if [ -n "$FILES" ]; then
+            HITS=$(echo "$FILES" | xargs grep -lE '@ts-ignore|@ts-nocheck|@ts-expect-error' 2>/dev/null || true)
+            if [ -n "$HITS" ]; then echo "::error::TS suppression found in: $HITS"; exit 1; fi
+          fi
+          echo "No TS suppressions found"
+
+      # [7] Block explicit any — mirrors pre-commit hook [7]
+      - name: Block explicit any
+        run: |
+          FILES=$(git diff --name-only "origin/$BASE_REF"...HEAD 2>/dev/null | grep -E '\.ts$' | grep -vE '^(node_modules/|dist/|\.gitnexus/|\.claude/)' | grep -vE 'playwright\.config\.(ts|js)$|eslint\.config\.(ts|js)$' || true)
+          if [ -n "$FILES" ]; then
+            HITS=$(echo "$FILES" | xargs grep -lP ':\s*any\b|as\s+any\b|<any>' 2>/dev/null || true)
+            if [ -n "$HITS" ]; then echo "::error::Explicit 'any' found in: $HITS"; exit 1; fi
+          fi
+          echo "No explicit any found"
+
+      # [8] Block nolint comments — mirrors pre-commit hook [8]
+      - name: Block nolint comments
+        run: |
+          FILES=$(git diff --name-only "origin/$BASE_REF"...HEAD 2>/dev/null | grep -E '\.(ts|js)$' | grep -vE '^(node_modules/|dist/|\.gitnexus/|\.claude/)' | grep -vE '\.pre-commit-config\.yaml$|^docs/|\.md$' || true)
+          if [ -n "$FILES" ]; then
+            HITS=$(echo "$FILES" | xargs grep -lP '//\s*nolint' 2>/dev/null || true)
+            if [ -n "$HITS" ]; then echo "::error::nolint comment found in: $HITS"; exit 1; fi
+          fi
+          echo "No nolint comments found"
+
+      # [9] Block TODO/FIXME without ticket — mirrors pre-commit hook [9]
+      - name: Block TODO/FIXME without ticket
+        run: |
+          FILES=$(git diff --name-only "origin/$BASE_REF"...HEAD 2>/dev/null | grep -E '\.(ts|js)$' | grep -vE '^(node_modules/|dist/|\.gitnexus/|\.claude/)' | grep -vE 'playwright\.config\.(ts|js)$|eslint\.config\.(ts|js)$' || true)
+          if [ -n "$FILES" ]; then
+            HITS=$(echo "$FILES" | xargs grep -PE '(TODO|FIXME)(?!.*?(AP-[0-9]+|#[0-9]+))' 2>/dev/null || true)
+            if [ -n "$HITS" ]; then echo "::error::TODO/FIXME without ticket ref: $HITS"; exit 1; fi
+          fi
+          echo "No untracked TODOs found"
+
+      # [12] License compliance — mirrors pre-commit hook [12]
+      - name: License compliance (no GPL/LGPL/AGPL)
+        run: |
+          npx --yes --package license-checker@25 -- license-checker \
+            --failOn "GPL-3.0;LGPL-2.1;LGPL-3.0;AGPL-3.0" \
+            --excludePrivatePackages 2>&1 | grep -E "^(FAIL|ERROR)" && exit 1 || true
+
+      # [13] Duplicate dep version check — mirrors pre-commit hook [13]
+      - name: Duplicate dep version check
+        run: |
+          DUPS=$(npm ls --depth=1 2>&1 | grep -E "UNMET PEER|invalid" | head -5 || true)
+          if [ -n "$DUPS" ]; then echo "::error::$DUPS"; exit 1; fi
+          echo "Dep versions OK"
+
+      # [15] Biome lint/format — mirrors pre-commit hook [15]
+      - name: Biome (lint/format)
+        run: |
+          if [ ! -f "biome.json" ] && [ ! -f "biome.jsonc" ]; then
+            echo "No biome.json — skipping Biome"
+            exit 0
+          fi
+          FILES=$(git diff --name-only "origin/$BASE_REF"...HEAD 2>/dev/null | grep -E '\.(ts|js|json)$' | grep -vE '^(node_modules/|dist/|\.gitnexus/|\.claude/)' | grep -vE '\.md$|\.env.*|package-lock\.json$|tsconfig.*\.json$' || true)
+          if [ -z "$FILES" ]; then
+            echo "No TS/JS/JSON files — skipping Biome"
+            exit 0
+          fi
+          npx @biomejs/biome check --diagnostic-level=error .
+
+      # [16] Circular dependency detection — mirrors pre-commit hook [16]
+      - name: Circular deps (madge)
+        run: |
+          failed=0
+          for dir in pages services utils config; do
+            if [ -d "$dir" ]; then
+              result=$(npx --yes --package madge@8 -- madge --circular --extensions ts "$dir" 2>&1)
+              code=$?
+              echo "Circular deps in $dir:"; echo "$result"
+              if [ $code -ne 0 ]; then failed=1; fi
+            fi
+          done
+          exit $failed
+
+      # [17] Module boundaries — mirrors pre-commit hook [17]
+      - name: Module boundaries
+        run: FULL_SCAN=true bash scripts/diff-aware-check.sh boundaries
+
+  # ── [E] Vitest Unit Tests ─────────────────────────────────────────────────────
+  vitest:
+    name: Vitest Unit Tests
+    runs-on: self-hosted
+    needs: static-checks
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: npm install --ignore-scripts
+      # [18] Vitest — mirrors pre-commit hook [18]
+      - name: Run unit tests
+        run: |
+          if find tests/unitTest -name "*.test.ts" 2>/dev/null | grep -q "."; then
+            npx vitest run --coverage
+          else
+            echo "No unit test files in tests/unitTest — skipping Vitest"
+          fi
+
+  # ── [F] Playwright E2E ────────────────────────────────────────────────────────
+  # Specs to run are controlled from scripts/e2e-suites.config.sh —
+  # uncomment lines to enable, comment to skip, add new lines for new specs.
+  # scripts/run-playwright-e2e.sh reads that config, checks env vars,
+  # writes .env, and exits 0 with a notice when no specs are enabled or
+  # required secrets are missing.
+  #
+  # URLs stored as repository Variables (Settings → Variables → Actions):
+  #   BASE_URL      — Apical front-end under test
+  #   API_URL       — API origin the front-end calls
+  #   ORGANIZATION  — tenant sub-domain used for X-Tenant
+  #   RUN_LIVE      — "1" to run the read-only @live backend checks
+  #
+  # Credentials stored as repository Secrets (Settings → Secrets → Actions):
+  #   MASTER_EMAIL / MASTER_PASSWORD      — required
+  #   COACHING_EMAIL / COACHING_PASSWORD  — optional (view-only + tenant cases)
+  #   TEACHER_EMAIL / TEACHER_PASSWORD    — optional (teacher-route regression)
+  playwright:
+    name: Playwright E2E (suite controlled by e2e-suites.config.sh)
+    runs-on: self-hosted
+    needs: vitest
+    if: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check if any specs are enabled
+        id: check_suites
+        run: |
+          source scripts/e2e-suites.config.sh
+          if [ "${#E2E_SPECS[@]}" -eq 0 ]; then
+            echo "has_specs=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No specs enabled in scripts/e2e-suites.config.sh — skipping install and run"
+          else
+            echo "has_specs=true" >> "$GITHUB_OUTPUT"
+            echo "${#E2E_SPECS[@]} spec(s) enabled — proceeding with install and run"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.check_suites.outputs.has_specs == 'true'
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        if: steps.check_suites.outputs.has_specs == 'true'
+        run: npm install --ignore-scripts
+
+      - name: Install Playwright browsers (chromium only for CI)
+        if: steps.check_suites.outputs.has_specs == 'true'
+        # --with-deps is required: the runner is an ephemeral container with no
+        # browser libs pre-installed. It runs as root, so no sudo prompt.
+        run: npx playwright install chromium --with-deps
+
+      - name: Run Playwright E2E (scripts/run-playwright-e2e.sh)
+        if: steps.check_suites.outputs.has_specs == 'true'
+        env:
+          BASE_URL:          ${{ vars.BASE_URL }}
+          API_URL:           ${{ vars.API_URL }}
+          ORGANIZATION:      ${{ vars.ORGANIZATION }}
+          RUN_LIVE:          ${{ vars.RUN_LIVE }}
+          MASTER_EMAIL:      ${{ secrets.MASTER_EMAIL }}
+          MASTER_PASSWORD:   ${{ secrets.MASTER_PASSWORD }}
+          COACHING_EMAIL:    ${{ secrets.COACHING_EMAIL }}
+          COACHING_PASSWORD: ${{ secrets.COACHING_PASSWORD }}
+          TEACHER_EMAIL:     ${{ secrets.TEACHER_EMAIL }}
+          TEACHER_PASSWORD:  ${{ secrets.TEACHER_PASSWORD }}
+        run: bash scripts/run-playwright-e2e.sh
+
+      - name: Upload Playwright report
+        if: steps.check_suites.outputs.has_specs == 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 2

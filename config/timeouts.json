@@ -1,0 +1,8 @@
+{
+  "testTimeout": 120000,
+  "expectTimeout": 15000,
+  "actionTimeout": 20000,
+  "navigationTimeout": 60000,
+  "uiRenderTimeout": 30000,
+  "quietWindow": 1000
+}

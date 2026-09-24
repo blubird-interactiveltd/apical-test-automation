@@ -1,0 +1,225 @@
+{
+  "type": "regular",
+  "listFixture": "onlineClassList.response.json",
+  "headers": [
+    "ONLINE CLASS TITLE",
+    "MODULES",
+    "CHAPTERS",
+    "DURATION(H)",
+    "TAGS",
+    "FEATURED",
+    "ACTIONS"
+  ],
+  "shareModeHeaders": ["ONLINE CLASS TITLE", "ACTIONS"],
+  "thumbnailSize": {
+    "width": 80,
+    "height": 40
+  },
+  "rows": [
+    {
+      "id": "148dfa19-2e4a-400d-b325-84ef539b63fc",
+      "title": "final-test 323",
+      "occurrence": 0,
+      "modules": "1",
+      "chapters": "3",
+      "expectedDuration": null,
+      "expectedTags": "asasas",
+      "featured": false
+    },
+    {
+      "id": "45da1f9c-033a-4dac-968c-102e9ea72b62",
+      "title": "udacity-test",
+      "occurrence": 0,
+      "modules": "2",
+      "chapters": "4",
+      "expectedDuration": null,
+      "expectedTags": "test, one",
+      "featured": true
+    },
+    {
+      "id": "82b040aa-e40a-4cf9-93d0-1dddeb5baeac",
+      "title": "sdds Copy",
+      "occurrence": 0,
+      "modules": "1",
+      "chapters": "2",
+      "expectedDuration": null,
+      "expectedTags": "dsds",
+      "featured": false
+    },
+    {
+      "id": "35a244d6-81b9-4cf1-b03d-07fe06d24932",
+      "title": "sdds Copy",
+      "occurrence": 1,
+      "modules": "1",
+      "chapters": "2",
+      "expectedDuration": null,
+      "expectedTags": "dsds",
+      "featured": false
+    },
+    {
+      "id": "3385888f-337e-4284-8bd3-c056ee02440d",
+      "title": "sdds Copy",
+      "occurrence": 2,
+      "modules": "1",
+      "chapters": "2",
+      "expectedDuration": null,
+      "expectedTags": "dsds",
+      "featured": false
+    },
+    {
+      "id": "a1d8437e-371d-4f66-b514-26b56bf8b742",
+      "title": "sdds Copy",
+      "occurrence": 3,
+      "modules": "1",
+      "chapters": "2",
+      "expectedDuration": null,
+      "expectedTags": "dsds",
+      "featured": false
+    },
+    {
+      "id": "aa7f5288-adfa-47a8-b6b3-6886802426cc",
+      "title": "sdds",
+      "occurrence": 0,
+      "modules": "1",
+      "chapters": "2",
+      "expectedDuration": null,
+      "expectedTags": "dsds",
+      "featured": false
+    },
+    {
+      "id": "d612163b-eb03-4e88-9552-63c4beff5811",
+      "title": "ewew",
+      "occurrence": 0,
+      "modules": "1",
+      "chapters": "2",
+      "expectedDuration": "00:06",
+      "expectedTags": null,
+      "featured": false
+    },
+    {
+      "id": "b19c1412-d4f7-4f88-9371-38cccaede038",
+      "title": "ds",
+      "occurrence": 0,
+      "modules": "1",
+      "chapters": "2",
+      "expectedDuration": null,
+      "expectedTags": null,
+      "featured": false
+    },
+    {
+      "id": "fc3698a2-5045-4f07-9a86-9d239cfa9074",
+      "title": "How to Create an Online Class",
+      "occurrence": 0,
+      "modules": "4",
+      "chapters": "21",
+      "expectedDuration": "10:00",
+      "expectedTags": "materials, Quality Assurance, productive",
+      "featured": true
+    },
+    {
+      "id": "a55e75fc-1320-43f1-ba17-d4f297bdc692",
+      "title": "Test Online Class das Copy",
+      "occurrence": 0,
+      "modules": "2",
+      "chapters": "5",
+      "expectedDuration": "15:00",
+      "expectedTags": "asasd",
+      "featured": false
+    },
+    {
+      "id": "53525106-255f-41d4-b2db-5e27af848f30",
+      "title": "Test Online Class das",
+      "occurrence": 0,
+      "modules": "2",
+      "chapters": "5",
+      "expectedDuration": "15:00",
+      "expectedTags": "asasd",
+      "featured": false
+    },
+    {
+      "id": "c5ee0144-4fc6-4176-9e4a-5c93687e9665",
+      "title": "asasas-99 Copy Copy",
+      "occurrence": 0,
+      "modules": "2",
+      "chapters": "4",
+      "expectedDuration": null,
+      "expectedTags": "aasas",
+      "featured": false
+    },
+    {
+      "id": "bf53563c-709e-4cb7-bea8-4422607fe491",
+      "title": "asasas-99 Copy",
+      "occurrence": 0,
+      "modules": "2",
+      "chapters": "4",
+      "expectedDuration": null,
+      "expectedTags": "aasas",
+      "featured": false
+    },
+    {
+      "id": "48bb8b76-5b63-4bee-acb9-9136a1b89ea2",
+      "title": "asasas-99",
+      "occurrence": 0,
+      "modules": "1",
+      "chapters": "2",
+      "expectedDuration": null,
+      "expectedTags": "aasas",
+      "featured": false
+    },
+    {
+      "id": "8570ff03-689a-43f6-b789-54b9c60f837c",
+      "title": "tesy-999",
+      "occurrence": 0,
+      "modules": "1",
+      "chapters": "2",
+      "expectedDuration": null,
+      "expectedTags": "sdsdsd",
+      "featured": false
+    },
+    {
+      "id": "32717c4b-28c3-4413-88fb-b9e637616d02",
+      "title": "New South Wales",
+      "occurrence": 0,
+      "modules": "1",
+      "chapters": "2",
+      "expectedDuration": null,
+      "expectedTags": "ddd",
+      "featured": false
+    },
+    {
+      "id": "a66df43d-b2ac-440e-9d7d-c54622cfdf6e",
+      "title": "coaching-test-1",
+      "occurrence": 0,
+      "modules": "1",
+      "chapters": "2",
+      "expectedDuration": null,
+      "expectedTags": "test",
+      "featured": false
+    },
+    {
+      "id": "3d4e5c2a-597a-4d23-b6ae-6e3b65206b16",
+      "title": "coaching-test",
+      "occurrence": 0,
+      "modules": "1",
+      "chapters": "2",
+      "expectedDuration": "24:04",
+      "expectedTags": "test -hholo",
+      "featured": false
+    },
+    {
+      "id": "e24f94c5-ed05-479e-83ac-6470f0233e2a",
+      "title": "Test Online Class 2",
+      "occurrence": 0,
+      "modules": "1",
+      "chapters": "2",
+      "expectedDuration": "07:00",
+      "expectedTags": "Test",
+      "featured": false
+    }
+  ],
+  "duplicateTitleTarget": {
+    "title": "sdds Copy",
+    "occurrence": 2,
+    "id": "3385888f-337e-4284-8bd3-c056ee02440d"
+  }
+}

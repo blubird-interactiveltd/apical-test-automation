@@ -1,0 +1,10 @@
+{
+  "type": "regular",
+  "viewportHeight": 900,
+  "viewportWidths": [1920, 1366, 1024, 768],
+  "axe": {
+    "scope": ".online_class_panel",
+    "blockingImpacts": ["serious", "critical"],
+    "finding": "A11Y-01"
+  }
+}
