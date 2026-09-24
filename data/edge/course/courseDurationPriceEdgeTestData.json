@@ -1,0 +1,10 @@
+{
+  "type": "edge",
+  "invalidNumbers": [
+    { "id": "AP-781-TC-036", "field": "duration", "value": "0" },
+    { "id": "AP-781-TC-036", "field": "duration", "value": "-5" },
+    { "id": "AP-781-TC-036", "field": "duration", "value": "abc" },
+    { "id": "AP-781-TC-036", "field": "oldPrice", "value": "-10" },
+    { "id": "AP-781-TC-036", "field": "newPrice", "value": "abc" }
+  ]
+}

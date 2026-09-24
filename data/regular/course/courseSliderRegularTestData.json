@@ -1,0 +1,38 @@
+{
+  "type": "regular",
+  "cases": [
+    {
+      "id": "AP-781-TC-028",
+      "scenario": "live class slider",
+      "path": "/course/properties/live-class",
+      "countField": "live_classes",
+      "allAccessField": "live_class_all_access",
+      "slider": 3,
+      "expectedFromSlider": 30,
+      "typed": 50,
+      "expectedSliderFromTyped": 5
+    },
+    {
+      "id": "AP-781-TC-029",
+      "scenario": "webinars slider",
+      "path": "/course/properties/webinars",
+      "countField": "webinars",
+      "allAccessField": "webinars_all_access",
+      "slider": 2,
+      "expectedFromSlider": 20,
+      "typed": 40,
+      "expectedSliderFromTyped": 4
+    },
+    {
+      "id": "AP-781-TC-030",
+      "scenario": "one-to-one appointment slider",
+      "path": "/course/properties/one-to-one-appointment",
+      "countField": "OneToOneAppointment",
+      "allAccessField": "one_to_one_appointment_all_access",
+      "slider": 1,
+      "expectedFromSlider": 10,
+      "typed": 30,
+      "expectedSliderFromTyped": 3
+    }
+  ]
+}

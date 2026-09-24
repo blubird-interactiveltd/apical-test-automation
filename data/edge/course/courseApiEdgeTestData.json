@@ -1,0 +1,19 @@
+{
+  "type": "edge",
+  "missingFields": [
+    { "id": "AP-781-TC-050", "scenario": "without a name", "path": ["name"] },
+    {
+      "id": "AP-781-TC-050",
+      "scenario": "without a description",
+      "path": ["description"]
+    },
+    {
+      "id": "AP-781-TC-050",
+      "scenario": "without a course duration",
+      "path": ["package_detail", "course_duration"]
+    }
+  ],
+  "scriptDescription": "<p>ok</p><img src=\"x\" onerror=\"alert(1)\">",
+  "foreignOrganizationId": "00000000-0000-4000-8000-00000000f0f0",
+  "unknownPackageId": "00000000-0000-4000-8000-00000000dead"
+}

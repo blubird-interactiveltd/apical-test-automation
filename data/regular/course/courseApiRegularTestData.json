@@ -1,0 +1,32 @@
+{
+  "type": "regular",
+  "payload": {
+    "name": "AP-781 live check",
+    "description": "<p>Created and deleted by the AP-781 live checks.</p>",
+    "thumbnail": "course/thumbnails/ap-781-live.png",
+    "type": "COURSE",
+    "active": 0,
+    "course_type": "ONLINE",
+    "online_link": "https://meet.example.com/ap-781",
+    "is_online": true,
+    "is_branch": false,
+    "questions": [],
+    "tests": [],
+    "package_detail": {
+      "is_pte_practice": false,
+      "is_practice_test": false,
+      "is_mock_test": false,
+      "is_quiz": false,
+      "is_materials": false,
+      "is_live_class": false,
+      "is_webinars": false,
+      "is_one_to_one_appointment": false,
+      "course_duration": "30",
+      "old_price": "100",
+      "new_price": "80",
+      "is_featured": 0,
+      "acceptTerms": true
+    }
+  },
+  "updatedThumbnail": "course/thumbnails/ap-781-live-updated.png"
+}

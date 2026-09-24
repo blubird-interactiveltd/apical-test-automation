@@ -1,0 +1,15 @@
+{
+  "items": [
+    {
+      "id": "5f0c1c1e-0000-4000-8000-000000000601",
+      "quiz_id": "QZ-0001",
+      "title": "Grammar Quiz One"
+    },
+    {
+      "id": "5f0c1c1e-0000-4000-8000-000000000602",
+      "quiz_id": "QZ-0002",
+      "title": "Grammar Quiz Two"
+    }
+  ],
+  "meta": { "current_page": 1, "last_page": 1, "per_page": 20, "total": 2 }
+}

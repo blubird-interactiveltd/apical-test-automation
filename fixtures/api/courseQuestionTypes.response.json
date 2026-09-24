@@ -1,0 +1,17 @@
+{
+  "items": [
+    {
+      "id": "5f0c1c1e-0000-4000-8000-000000000101",
+      "title": "Write From Dictation",
+      "slug": "write-from-dictation",
+      "section": "LISTENING"
+    },
+    {
+      "id": "5f0c1c1e-0000-4000-8000-000000000102",
+      "title": "Summarize Written Text",
+      "slug": "summarize-written-text",
+      "section": "WRITING"
+    }
+  ],
+  "meta": { "current_page": 1, "last_page": 1, "per_page": 20, "total": 2 }
+}
