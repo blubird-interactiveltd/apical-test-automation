@@ -87,7 +87,7 @@ test.describe("AP-781 course wizard navigation", () => {
     page,
   }) => {
     // Expected to fail, finding D-01: the edit button is commented out of the
-    // course list (views/courses/IndexView.vue:74-83), its handler pushes the
+    // course list (views/courses/IndexView.vue:75-85), its handler pushes the
     // route name `admin.course.create`, which has never existed (:159), and the
     // wizard has no code to load an existing course.
     test.fail();
