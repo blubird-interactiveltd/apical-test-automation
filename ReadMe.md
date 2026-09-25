@@ -26,6 +26,7 @@ npm run test:smoke          # Smoke suite
 npm run test:regression     # Full regression
 npm run test:unit           # Vitest unit tests
 npm run test:online-class   # AP-779 online class list
+npm run test:course         # AP-781 course create wizard
 npm test                    # Everything under tests/
 ```
 

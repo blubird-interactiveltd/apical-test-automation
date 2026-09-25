@@ -1,0 +1,15 @@
+{
+  "items": [
+    {
+      "id": "5f0c1c1e-0000-4000-8000-000000000301",
+      "t_id": "T-0001",
+      "title": "Reading Practice One"
+    },
+    {
+      "id": "5f0c1c1e-0000-4000-8000-000000000302",
+      "t_id": "T-0002",
+      "title": "Reading Practice Two"
+    }
+  ],
+  "meta": { "current_page": 1, "last_page": 1, "per_page": 20, "total": 2 }
+}

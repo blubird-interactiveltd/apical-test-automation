@@ -1,0 +1,51 @@
+{
+  "type": "regular",
+  "cases": [
+    {
+      "id": "AP-781-TC-022",
+      "scenario": "PTE practice questions",
+      "path": "/course/properties/pte-practice",
+      "section": "Write From Dictation",
+      "pick": [0, 2],
+      "idsField": "pte_practice_questions",
+      "countField": "pte_practice"
+    },
+    {
+      "id": "AP-781-TC-024",
+      "scenario": "practice tests",
+      "path": "/course/properties/practice-test",
+      "section": null,
+      "pick": [1],
+      "idsField": "practice_test_tests",
+      "countField": "practice_test"
+    },
+    {
+      "id": "AP-781-TC-025",
+      "scenario": "mock tests",
+      "path": "/course/properties/mock-test",
+      "section": null,
+      "pick": [0, 1],
+      "idsField": "mock_test_tests",
+      "countField": "mock_test"
+    },
+    {
+      "id": "AP-781-TC-026",
+      "scenario": "quizzes",
+      "path": "/course/properties/quiz",
+      "section": "Grammar",
+      "pick": [0],
+      "idsField": "quiz_tests",
+      "countField": "quiz_test"
+    },
+    {
+      "id": "AP-781-TC-027",
+      "scenario": "materials",
+      "path": "/course/properties/materials",
+      "section": null,
+      "pick": [1],
+      "idsField": "material_tests",
+      "countField": "material_test"
+    }
+  ],
+  "searchTerm": "dictation"
+}

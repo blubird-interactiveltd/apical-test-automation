@@ -1,0 +1,21 @@
+{
+  "type": "edge",
+  "required": [
+    { "id": "AP-781-TC-006", "scenario": "name is required", "omit": "name" },
+    {
+      "id": "AP-781-TC-007",
+      "scenario": "thumbnail is required",
+      "omit": "thumbnail"
+    },
+    {
+      "id": "AP-781-TC-008",
+      "scenario": "description is required",
+      "omit": "description"
+    }
+  ],
+  "whitespaceName": "     ",
+  "unicodeName": "Anglais B2 — Préparation 日本語 ✓",
+  "overLengthName": "QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA QA ",
+  "invalidFile": { "name": "notes.pdf", "mimeType": "application/pdf" },
+  "tooLargeMessage": "Request Entity Too Large"
+}

@@ -1,0 +1,15 @@
+{
+  "items": [
+    {
+      "id": "5f0c1c1e-0000-4000-8000-000000000401",
+      "t_id": "M-0001",
+      "title": "Full Mock One"
+    },
+    {
+      "id": "5f0c1c1e-0000-4000-8000-000000000402",
+      "t_id": "M-0002",
+      "title": "Full Mock Two"
+    }
+  ],
+  "meta": { "current_page": 1, "last_page": 1, "per_page": 20, "total": 2 }
+}

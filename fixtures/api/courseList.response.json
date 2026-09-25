@@ -1,0 +1,17 @@
+{
+  "items": [
+    {
+      "id": "5f0c1c1e-0000-4000-8000-000000000801",
+      "name": "IELTS Foundation",
+      "type": "COURSE",
+      "online_link": "https://meet.example.com/ielts",
+      "package_detail": {
+        "course_duration": 30,
+        "old_price": "120",
+        "new_price": "90",
+        "created_at": "2026-09-01T09:00:00.000000Z"
+      }
+    }
+  ],
+  "meta": { "current_page": 1, "last_page": 1, "per_page": 20, "total": 1 }
+}

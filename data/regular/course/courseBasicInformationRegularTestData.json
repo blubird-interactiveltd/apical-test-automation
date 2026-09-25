@@ -1,0 +1,14 @@
+{
+  "type": "regular",
+  "valid": {
+    "name": "QA Course AP-781",
+    "thumbnailFile": "QA-Thumb.PNG",
+    "uploadedPath": "course/thumbnails/qa-thumb.png",
+    "description": "A four-week PTE preparation course."
+  },
+  "richDescription": {
+    "html": "<p><strong>Bold intro</strong></p><ul><li>First point</li></ul>",
+    "boldText": "Bold intro",
+    "listItem": "First point"
+  }
+}

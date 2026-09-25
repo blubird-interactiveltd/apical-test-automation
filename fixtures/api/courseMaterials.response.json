@@ -1,0 +1,17 @@
+{
+  "items": [
+    {
+      "id": "5f0c1c1e-0000-4000-8000-000000000701",
+      "m_id": "MAT-0001",
+      "file_type": "PDF",
+      "file_name": "syllabus.pdf"
+    },
+    {
+      "id": "5f0c1c1e-0000-4000-8000-000000000702",
+      "m_id": "MAT-0002",
+      "file_type": "VIDEO",
+      "file_name": "orientation.mp4"
+    }
+  ],
+  "meta": { "current_page": 1, "last_page": 1, "per_page": 20, "total": 2 }
+}

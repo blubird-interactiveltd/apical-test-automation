@@ -1,0 +1,60 @@
+{
+  "type": "regular",
+  "addOns": [
+    {
+      "key": "is_pte_practice",
+      "label": "PTE Practice",
+      "step": {
+        "name": "PTE Practice",
+        "path": "/course/properties/pte-practice"
+      }
+    },
+    {
+      "key": "is_practice_test",
+      "label": "Practice Test",
+      "step": {
+        "name": "Practice Test",
+        "path": "/course/properties/practice-test"
+      }
+    },
+    {
+      "key": "is_mock_test",
+      "label": "Mock Test",
+      "step": { "name": "Mock Test", "path": "/course/properties/mock-test" }
+    },
+    {
+      "key": "is_quiz",
+      "label": "Quiz",
+      "step": { "name": "Quiz", "path": "/course/properties/quiz" }
+    },
+    {
+      "key": "is_materials",
+      "label": "Materials",
+      "step": { "name": "Materials", "path": "/course/properties/materials" }
+    },
+    {
+      "key": "is_live_class",
+      "label": "Live Class",
+      "step": { "name": "Live Class", "path": "/course/properties/live-class" }
+    },
+    {
+      "key": "is_webinars",
+      "label": "Webinars",
+      "step": { "name": "Webinars", "path": "/course/properties/webinars" }
+    },
+    {
+      "key": "is_one_to_one_appointment",
+      "label": "One-One Appointment",
+      "step": {
+        "name": "One To One Appointment",
+        "path": "/course/properties/one-to-one-appointment"
+      }
+    }
+  ],
+  "partial": {
+    "id": "AP-781-TC-019",
+    "disable": ["is_pte_practice", "is_mock_test", "is_quiz", "is_webinars"],
+    "expectedFirstStep": "/course/properties/practice-test",
+    "hiddenSteps": ["PTE Practice", "Mock Test", "Quiz", "Webinars"]
+  }
+}

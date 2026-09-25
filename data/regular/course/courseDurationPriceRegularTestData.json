@@ -1,0 +1,4 @@
+{
+  "type": "regular",
+  "valid": { "duration": "30", "oldPrice": "100", "newPrice": "80" }
+}

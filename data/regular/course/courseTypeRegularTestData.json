@@ -1,0 +1,27 @@
+{
+  "type": "regular",
+  "cases": [
+    {
+      "id": "AP-781-TC-014",
+      "scenario": "online course",
+      "courseType": "ONLINE",
+      "onlineLink": "https://meet.example.com/qa",
+      "expected": { "is_online": true, "is_branch": false }
+    },
+    {
+      "id": "AP-781-TC-015",
+      "scenario": "branch course",
+      "courseType": "BRANCH",
+      "onlineLink": "",
+      "expected": { "is_online": false, "is_branch": true }
+    },
+    {
+      "id": "AP-781-TC-016",
+      "scenario": "online and branch course",
+      "courseType": "BOTH",
+      "onlineLink": "https://meet.example.com/qa",
+      "expected": { "is_online": true, "is_branch": true }
+    }
+  ],
+  "invalidLink": "not a url"
+}

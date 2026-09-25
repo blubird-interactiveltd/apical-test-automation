@@ -15,6 +15,7 @@
     "test:smoke": "npx playwright test --pass-with-no-tests tests/e2e/smoke --workers=6",
     "test:regression": "npx playwright test --pass-with-no-tests tests/e2e/regression --workers=6",
     "test:online-class": "npx playwright test --pass-with-no-tests --project=chromium tests/tickets/AP-779-online-class-list",
+    "test:course": "npx playwright test --pass-with-no-tests --project=chromium tests/tickets/AP-781-course-create",
     "test:unit": "vitest run",
     "test:unit:coverage": "vitest run --coverage"
   },

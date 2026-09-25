@@ -1,0 +1,16 @@
+{
+  "type": "regular",
+  "name": "QA End To End Course",
+  "description": "Created by AP-781-TC-044.",
+  "uploadedPath": "course/thumbnails/e2e-thumb.png",
+  "courseType": "BOTH",
+  "onlineLink": "https://meet.example.com/e2e",
+  "pick": { "pte": 0, "practice": 0, "mock": 1, "quiz": 1, "material": 0 },
+  "slider": 2,
+  "duration": "45",
+  "oldPrice": "150",
+  "newPrice": "99",
+  "packageId": "5f0c1c1e-0000-4000-8000-000000000999",
+  "renamedThumbnail": "course/thumbnails/course_thumbnail_5f0c1c1e-0000-4000-8000-000000000999.png",
+  "successMessage": "Course created successfully"
+}
