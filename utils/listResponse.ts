@@ -1,20 +1,18 @@
-import type {
-  OnlineClass,
-  OnlineClassListResponse,
-} from "./types/onlineClass/onlineClass.types";
+import type { OnlineClass } from "./types/onlineClass/onlineClass.types";
+import type { ListResponse } from "./types/shared/listResponse.types";
 
 /**
- * Builds one page of `GET /api/v1/online-class` the way Laravel paginates it.
+ * Builds one page of a Laravel-paginated list the way the API sends it.
  *
  * `from`/`to` are null on an empty result, as Laravel sends them, because the
- * list page's paginator reads them and an invented `0` would hide that case.
+ * list pages' paginators read them and an invented `0` would hide that case.
  */
-export function buildListResponse(
-  items: OnlineClass[],
+export function buildListResponse<T>(
+  items: T[],
   page = 1,
   perPage = 20,
   total = items.length,
-): OnlineClassListResponse {
+): ListResponse<T> {
   const lastPage = Math.max(1, Math.ceil(total / perPage));
   const from = total ? (page - 1) * perPage + 1 : null;
 
@@ -54,11 +52,11 @@ export function makeClasses(
 }
 
 /** Slices `all` into the page a `?page=` request asks for. */
-export function pageOf(
-  all: OnlineClass[],
+export function pageOf<T>(
+  all: T[],
   page: number,
   perPage: number,
-): OnlineClassListResponse {
+): ListResponse<T> {
   const start = (page - 1) * perPage;
 
   return buildListResponse(

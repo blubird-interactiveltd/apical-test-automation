@@ -1,0 +1,12 @@
+{
+  "type": "edge",
+  "longIndexLength": 255,
+  "htmlTitle": "<p><strong>Bold</strong> transcript with <em>markup</em></p>",
+  "lowFrequency": { "qId": "RS00237", "frequency": "LOW" },
+  "nullFrequency": { "qId": "RS00237" },
+  "specialSearchTerms": ["%", "'", "["],
+  "caseSearch": { "term": "rs0001", "matchesWhenInsensitive": 5 },
+  "unknownSortColumn": "not_a_column",
+  "listError": { "status": 500, "message": "Server Error" },
+  "slowListMs": 2000
+}
