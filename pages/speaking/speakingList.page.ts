@@ -97,9 +97,9 @@ export class SpeakingListPage {
   }
 
   /** Opens a list path and waits for its heading. */
-  async goto(path: string): Promise<void> {
+  async goto(path: string, timeout = timeouts.uiRenderTimeout): Promise<void> {
     await this.page.goto(path, { waitUntil: "domcontentloaded" });
-    await this.heading.waitFor({ timeout: timeouts.uiRenderTimeout });
+    await this.heading.waitFor({ timeout });
   }
 
   async waitForRows(): Promise<void> {

@@ -33,6 +33,18 @@ export function backoffMs(retryAfter: string | undefined): number {
     : DEFAULT_BACKOFF_MS;
 }
 
+/**
+ * Whether the API refused `response` for the rate limit. Stage answers a
+ * throttled call with 429 *or* with `404 {"message":"Too Many Attempts."}`,
+ * so the status alone does not tell.
+ */
+export async function isThrottled(response: APIResponse): Promise<boolean> {
+  if (response.status() === 429) return true;
+  if (response.status() !== 404) return false;
+
+  return (await response.text()).includes("Too Many Attempts");
+}
+
 function keyOf(route: Route): string {
   const request = route.request();
 
@@ -62,12 +74,17 @@ function toDisk(key: string, reply: CachedReply): void {
   fs.renameSync(temp, target);
 }
 
-/** `route.fetch()`, waiting out the API's 60/min throttle (finding F-12). */
-async function fetchThrottled(route: Route): Promise<APIResponse> {
+/**
+ * `route.fetch()`, waiting out the API's 60/min throttle (finding F-12).
+ *
+ * Exported for routes that must reach the real API uncached, such as a write
+ * a spec captures or a list that must show what was just created.
+ */
+export async function fetchThrottled(route: Route): Promise<APIResponse> {
   for (let attempt = 1; ; attempt++) {
     const response = await route.fetch();
 
-    if (response.status() !== 429 || attempt === MAX_ATTEMPTS) {
+    if (!(await isThrottled(response)) || attempt === MAX_ATTEMPTS) {
       return response;
     }
 
@@ -105,7 +122,15 @@ export class ApiResponseCache {
         return route.continue();
       }
 
-      const reply = await ApiResponseCache.get(route);
+      let reply: CachedReply;
+      try {
+        reply = await ApiResponseCache.get(route);
+      } catch (error) {
+        // The app navigated away while this GET was in flight, so Playwright
+        // disposed its response; nobody is waiting for an answer any more.
+        if (String(error).includes("Response has been disposed")) return;
+        throw error;
+      }
 
       return route.fulfill({
         status: reply.status,

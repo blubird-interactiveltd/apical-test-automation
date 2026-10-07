@@ -34,7 +34,7 @@ Boundary violations are blocked by pre-commit hook [17] and enforced in CI.
 
 ## Modules
 
-`auth`, `onlineClass`, `course`. Add a module by creating the same-named folder under
+`auth`, `onlineClass`, `course`, `speaking`. Add a module by creating the same-named folder under
 `data/regular`, `data/edge`, `pages`, `services` and `utils/types`.
 
 ## Key Commands
@@ -45,6 +45,7 @@ npm run test:regression     # Full regression
 npm run test:unit           # Vitest unit tests
 npm run test:online-class   # AP-779 only
 npm run test:course         # AP-781 only
+npm run test:speaking-create # AP-807 only — creates and deletes stage questions
 npx playwright test tests/tickets/AP-XXX-*/   # Run a single ticket in isolation
 ```
 

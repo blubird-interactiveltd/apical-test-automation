@@ -16,6 +16,7 @@
     "test:regression": "npx playwright test --pass-with-no-tests tests/e2e/regression --workers=6",
     "test:online-class": "npx playwright test --pass-with-no-tests --project=chromium tests/tickets/AP-779-online-class-list",
     "test:course": "npx playwright test --pass-with-no-tests --project=chromium tests/tickets/AP-781-course-create",
+    "test:speaking-create": "cross-env RUN_LIVE=1 npx playwright test --pass-with-no-tests --project=chromium --workers=1 tests/tickets/AP-807-speaking-create",
     "test:unit": "vitest run",
     "test:unit:coverage": "vitest run --coverage"
   },

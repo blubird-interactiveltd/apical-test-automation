@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import type { Page } from "@playwright/test";
+import type { APIRequestContext, Page } from "@playwright/test";
 import { EnvLoader } from "../../utils/envLoader";
 import {
   STATE_MAX_AGE_MS,
@@ -16,6 +16,23 @@ import type {
 } from "../../utils/types/auth/auth.types";
 import { ApicalAuthService } from "./apicalAuth.service";
 
+/** `userTypeMap` in apical `src/data/enum.js`. */
+const USER_TYPE_MAP: Record<string, string> = {
+  SUPER_ADMIN: "MASTER",
+  TRAINER: "TEACHER",
+};
+
+/**
+ * The `user_type` the app stores for an API user type (`Login.vue:120-123`).
+ *
+ * The router redirects any `/master|/admin|/teacher|…` URL whose first segment
+ * differs from the lower-cased `user_type`, so the raw `SUPER_ADMIN` would send
+ * every master page to the non-existent `/super_admin/portal` (a 404).
+ */
+export function appUserType(apiUserType: string): string {
+  return USER_TYPE_MAP[apiUserType] ?? apiUserType.replace(/_/g, "-");
+}
+
 /** The keys `Login.vue` writes after a successful login. */
 function toEntries(session: ApicalSession): StorageEntry[] {
   const entries: StorageEntry[] = [{ name: "token", value: session.token }];
@@ -24,7 +41,7 @@ function toEntries(session: ApicalSession): StorageEntry[] {
   if (session.user_id !== undefined)
     entries.push({ name: "user_id", value: String(session.user_id) });
   if (session.user_type)
-    entries.push({ name: "user_type", value: session.user_type });
+    entries.push({ name: "user_type", value: appUserType(session.user_type) });
   if (session.organization_id !== undefined)
     entries.push({
       name: "organization_id",
@@ -50,13 +67,34 @@ export class ApicalLoginService {
   static async ensureLoggedIn(page: Page, role: ApicalRole): Promise<void> {
     const entries =
       ApicalLoginService.cachedEntries(role) ??
-      (await ApicalLoginService.freshEntries(page, role));
+      (await ApicalLoginService.freshEntries(page.request, role));
 
     await page.context().addInitScript((items: StorageEntry[]) => {
       for (const item of items) {
         window.localStorage.setItem(item.name, item.value);
       }
     }, entries);
+  }
+
+  /**
+   * The bearer token of `role`'s session, from the same cache the browser
+   * sessions use. API helpers call this so a suite logs in once per role, not
+   * once per test — every login counts against the 60/min limit (F-12).
+   */
+  static async token(
+    request: APIRequestContext,
+    role: ApicalRole,
+  ): Promise<string> {
+    const entries =
+      ApicalLoginService.cachedEntries(role) ??
+      (await ApicalLoginService.freshEntries(request, role));
+    const token = entries.find((entry) => entry.name === "token")?.value;
+
+    if (!token) {
+      throw new Error(`The ${role} session holds no token.`);
+    }
+
+    return token;
   }
 
   /**
@@ -83,10 +121,10 @@ export class ApicalLoginService {
   }
 
   private static async freshEntries(
-    page: Page,
+    request: APIRequestContext,
     role: ApicalRole,
   ): Promise<StorageEntry[]> {
-    const session = await ApicalAuthService.getSession(page.request, role);
+    const session = await ApicalAuthService.getSession(request, role);
     const entries = toEntries(session);
     const state: SavedState = {
       cookies: [],
