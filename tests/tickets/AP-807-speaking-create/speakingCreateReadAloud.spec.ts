@@ -105,10 +105,7 @@ test.describe("AP-807 speaking create — Read Aloud", () => {
     page,
     request,
   }) => {
-    // F-20 (new, seen on stage): the details dialog renders the title only when
-    // section !== 'SPEAKING' (molecule/question/questionList.vue:3-6), so a Read Aloud
-    // passage is never shown; the API does return it.
-    test.fail();
+    // Regression guard for #818.
     const { form, api, listPage } = await SpeakingCreateService.open(page, {
       liveList: true,
     });

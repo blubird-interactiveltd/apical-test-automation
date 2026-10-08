@@ -57,12 +57,7 @@ test.describe("AP-807 speaking create — Retell Lecture", () => {
     page,
     request,
   }) => {
-    // F-15 (new): RetellLecture.vue binds the keyword sync to the first `form`
-    // object (createHandlers(form.value, …), line 84), but VideoAndAudio's
-    // v-model replaces that object on every upload (VideoAndAudio.vue:79-86).
-    // A transcript typed after the upload syncs into the discarded object, so
-    // the Keyword box stays empty and no keywords are sent.
-    test.fail();
+    // Regression guard for #815.
     const { form, api } = await SpeakingCreateService.open(page, {
       type: "RL",
     });
@@ -217,10 +212,7 @@ test.describe("AP-807 speaking create — Retell Lecture", () => {
   test("a non-video file on the Video tab is refused (AP-807-TC-408)", async ({
     page,
   }) => {
-    // F-21 (new, seen on stage): the global 422 handler shows "File: Unsupported file type."
-    // (validation/backendMessages.js:63), then the uploader's own catch replaces it with
-    // data.message, "The given data was invalid." (ImageUploader.vue:111-114, VideoRecordAndUploader.vue:235-238).
-    test.fail();
+    // Regression guard for #820.
     const { form, api } = await SpeakingCreateService.open(page, {
       type: "RL",
     });

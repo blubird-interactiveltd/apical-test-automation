@@ -192,10 +192,7 @@ test.describe("AP-807 speaking create — media upload", () => {
   test("a non-image file is refused with no preview (AP-807-TC-077)", async ({
     page,
   }) => {
-    // F-21 (new, seen on stage): the global 422 handler shows "File: Unsupported file type."
-    // (validation/backendMessages.js:63), then the uploader's own catch replaces it with
-    // data.message, "The given data was invalid." (ImageUploader.vue:111-114, VideoRecordAndUploader.vue:235-238).
-    test.fail();
+    // Regression guard for #820.
     const { form, api } = await SpeakingCreateService.open(page, {
       type: "DI",
     });
@@ -254,11 +251,7 @@ test.describe("AP-807 speaking create — media upload", () => {
   test("Publish during an upload never saves an empty or blob file_path (AP-807-TC-080)", async ({
     page,
   }) => {
-    // F-01: Publish does not wait for the upload, and RS has no file_path rule
-    // in the UI (RepeatSentence.vue: rules only list transcript; the rule is
-    // never run anyway, CreateView.vue:406-411) or the API, so the question
-    // is saved with file_path "" while the upload is still running.
-    test.fail();
+    // Regression guard for #813.
     const { form, api } = await SpeakingCreateService.open(page, {
       type: "RS",
       uploads: { delayMs: edge.slowUploadMs },
@@ -273,13 +266,15 @@ test.describe("AP-807 speaking create — media upload", () => {
       .setInputFiles(mediaFile("speaking-short.mp3"));
     await form.publishButton.click();
     await api.upload(1, WRITE_TIMEOUT_MS);
+    // Publish stays disabled until the upload answers, so the one save carries its URL.
+    // Waiting for that POST keeps the test from ending while it is still in flight.
+    const post = await api.post(1, WRITE_TIMEOUT_MS);
     await SpeakingCreateService.settle(page);
 
-    for (const post of api.posts) {
-      expect(post.payload.file_path ?? "").toMatch(
-        new RegExp(data.upload.httpsUrlPattern),
-      );
-    }
+    expect(post.payload.file_path ?? "").toMatch(
+      new RegExp(data.upload.httpsUrlPattern),
+    );
+    expect(api.posts).toHaveLength(1);
   });
 
   test("an upload refused for permission shows the server message (AP-807-TC-081)", async ({

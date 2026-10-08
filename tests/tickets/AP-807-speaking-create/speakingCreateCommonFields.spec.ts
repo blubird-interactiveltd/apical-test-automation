@@ -177,8 +177,10 @@ test.describe("AP-807 speaking create — common fields", () => {
     const { form, api } = await SpeakingCreateService.open(page, {
       type: "RS",
     });
+    // RS requires audio (#813), so the save reaches the server's index check.
     await SpeakingCreateService.fill(form, api, "RS", {
       index: taken,
+      media: "speaking-short.mp3",
       transcript: data.content.RS.transcript ?? "",
     });
 

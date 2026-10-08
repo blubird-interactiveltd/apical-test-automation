@@ -78,9 +78,7 @@ test.describe("AP-807 speaking create — Describe Image", () => {
   test("DI cannot be published without an image (AP-807-TC-303)", async ({
     page,
   }) => {
-    // F-01: DescribeImage.vue's `file_path: { required }` never runs
-    // (CreateView.vue:406-411), and the API requires file_path only for RL.
-    test.fail();
+    // Regression guard for #817.
     const { form, api } = await SpeakingCreateService.open(page, {
       type: "DI",
     });

@@ -225,12 +225,7 @@ test.describe("AP-807 speaking create — form shell & navigation", () => {
   test("the create URL without ?type does not crash or mix sections (AP-807-TC-009)", async ({
     page,
   }) => {
-    // F-17 (new, seen on stage): with no ?type, CreateView asks for
-    // `question-types?section=undefined` and commits its first item; the
-    // `setSelectedQuestionType` mutation then destructures `find(...)` of
-    // nothing and throws "Cannot destructure property 'component'"
-    // (store/modules/question.js:110, CreateView.vue:591).
-    test.fail();
+    // Regression guard for #819.
     const pageErrors: string[] = [];
     page.on("pageerror", (error) => pageErrors.push(error.message));
     const typesResponse = page.waitForResponse((response) =>

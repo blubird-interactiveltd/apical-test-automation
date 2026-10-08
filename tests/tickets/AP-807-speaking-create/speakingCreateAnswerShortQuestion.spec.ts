@@ -102,9 +102,7 @@ test.describe("AP-807 speaking create — Answer Short Question", () => {
   test("ASQ cannot be published without a transcript (AP-807-TC-504)", async ({
     page,
   }) => {
-    // F-01: AnswerShortQuestion.vue's transcript rule never runs (CreateView.vue:406-411).
-    // F-02: its message tests `!v$.value.transcript.required`, always truthy (AnswerShortQuestion.vue:104).
-    test.fail();
+    // Regression guard for #817.
     const { form, api } = await SpeakingCreateService.open(page, {
       type: "ASQ",
     });
@@ -123,8 +121,7 @@ test.describe("AP-807 speaking create — Answer Short Question", () => {
   test("ASQ cannot be published without audio (AP-807-TC-505)", async ({
     page,
   }) => {
-    // F-01: no file_path rule for ASQ in the UI or in QuestionStoreRequest.
-    test.fail();
+    // Regression guard for #813.
     const { form, api } = await SpeakingCreateService.open(page, {
       type: "ASQ",
     });
@@ -143,9 +140,7 @@ test.describe("AP-807 speaking create — Answer Short Question", () => {
     page,
     request,
   }) => {
-    // F-18 (new, seen on stage): the form sends no file_type for this type, and the server
-    // only measures file_duration when file_type is sent, so total_answer_time leaves out the media.
-    test.fail();
+    // Regression guard for #812.
     const { form, api } = await SpeakingCreateService.open(page, {
       type: "ASQ",
     });

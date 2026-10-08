@@ -197,9 +197,12 @@ test.describe("AP-807 speaking create — draft, publish, create another", () =>
       index: qaIndex("RS"),
       transcript: data.content.RS.transcript ?? "",
     });
-    const second = await SpeakingCreateService.submit(form, api);
+    // RS requires audio (#813): if the first file_path had carried over, this
+    // Publish would save a second question with it.
+    await form.publishButton.click();
+    await SpeakingCreateService.settle(page);
 
-    expect(second.payload.file_path ?? "").not.toBe(first.payload.file_path);
+    expect(api.posts.filter((post) => post.status === 201)).toHaveLength(1);
   });
 
   test("Create another is not offered when editing (AP-807-TC-046)", async ({

@@ -69,7 +69,8 @@ test.describe("AP-807 speaking create — Repeat Sentence", () => {
     expect(post.payload.file_path).toBe(uploadedUrl(api.uploads[0]));
     expect(post.payload.transcript).toBe(transcript);
     expect(post.payload.keywords).toBe(data.content.RS.keywords);
-    expect(post.payload).not.toHaveProperty("file_type");
+    // The API measures file_duration only when file_type is sent (#812).
+    expect(post.payload.file_type).toBe("audio");
     const record = await (
       await SpeakingQuestionApi.as(request)
     ).get(String(post.body.question_id), "edit");
@@ -84,11 +85,7 @@ test.describe("AP-807 speaking create — Repeat Sentence", () => {
   test("RS cannot be published without a transcript (AP-807-TC-203)", async ({
     page,
   }) => {
-    // F-01: RepeatSentence.vue's `transcript: { required }` never runs
-    // (CreateView.vue:406-411 reads a $v the component does not expose).
-    // F-02: even then its message tests `!v$.value.transcript.required`,
-    // a rule object that is always truthy (RepeatSentence.vue:103).
-    test.fail();
+    // Regression guard for #817.
     const { form, api } = await SpeakingCreateService.open(page, {
       type: "RS",
     });
@@ -107,9 +104,7 @@ test.describe("AP-807 speaking create — Repeat Sentence", () => {
   test("RS cannot be published without audio (AP-807-TC-204)", async ({
     page,
   }) => {
-    // F-01: neither the UI (RepeatSentence.vue rules list only transcript)
-    // nor QuestionStoreRequest requires file_path for RS.
-    test.fail();
+    // Regression guard for #813.
     const { form, api } = await SpeakingCreateService.open(page, {
       type: "RS",
     });
@@ -128,9 +123,7 @@ test.describe("AP-807 speaking create — Repeat Sentence", () => {
     page,
     request,
   }) => {
-    // F-18 (new, seen on stage): the form sends no file_type for this type, and the server
-    // only measures file_duration when file_type is sent, so total_answer_time leaves out the media.
-    test.fail();
+    // Regression guard for #812.
     const { form, api } = await SpeakingCreateService.open(page, {
       type: "RS",
     });

@@ -100,8 +100,7 @@ test.describe("AP-807 speaking create — Respond To A Situation", () => {
   test("RTAS cannot be published without audio (AP-807-TC-704)", async ({
     page,
   }) => {
-    // F-01: no file_path rule for RTAS in the UI or in QuestionStoreRequest.
-    test.fail();
+    // Regression guard for #813.
     const { form, api } = await SpeakingCreateService.open(page, {
       type: "RTAS",
     });
@@ -120,9 +119,7 @@ test.describe("AP-807 speaking create — Respond To A Situation", () => {
     page,
     request,
   }) => {
-    // F-18 (new, seen on stage): the form sends no file_type for this type, and the server
-    // only measures file_duration when file_type is sent, so total_answer_time leaves out the media.
-    test.fail();
+    // Regression guard for #812.
     const { form, api } = await SpeakingCreateService.open(page, {
       type: "RTAS",
     });
