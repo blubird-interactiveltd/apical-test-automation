@@ -1,3 +1,5 @@
+import type { ListResponse } from "../shared/listResponse.types";
+
 /**
  * One row of `GET /api/v1/online-class`, as `OnlineClassListResource` shapes it
  * (apical-api `app/Http/Resources/OnlineClassListResource.php`).
@@ -29,21 +31,10 @@ export interface OnlineClass {
   completion_rate: string;
 }
 
-export interface ListMeta {
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  from: number | null;
-  to: number | null;
-}
+export type { ListMeta } from "../shared/listResponse.types";
 
 /** Laravel resource-collection envelope the list page reads. */
-export interface OnlineClassListResponse {
-  items: OnlineClass[];
-  links: { prev: string | null; next: string | null };
-  meta: ListMeta;
-}
+export type OnlineClassListResponse = ListResponse<OnlineClass>;
 
 /** `GET /api/v1/online-class/{id}` — the list row plus detail-only fields. */
 export interface OnlineClassDetailResponse {
@@ -55,8 +46,4 @@ export interface OnlineClassDetailResponse {
   };
 }
 
-/** A stubbed error reply for the list endpoint. */
-export interface StubbedError {
-  status: number;
-  body?: Record<string, unknown>;
-}
+export type { StubbedError } from "../shared/listResponse.types";

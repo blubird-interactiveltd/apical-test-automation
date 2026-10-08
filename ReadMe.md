@@ -27,6 +27,7 @@ npm run test:regression     # Full regression
 npm run test:unit           # Vitest unit tests
 npm run test:online-class   # AP-779 online class list
 npm run test:course         # AP-781 course create wizard
+npm run test:speaking-create # AP-807 speaking question create (writes to stage, RUN_LIVE=1)
 npm test                    # Everything under tests/
 ```
 
@@ -35,7 +36,7 @@ npm test                    # Everything under tests/
 ```
 config/      Shared constants (timeouts)
 data/        JSON scenarios — regular/<module>/, edge/<module>/
-fixtures/    Recorded API responses used as stub bodies — api/
+fixtures/    Recorded API responses used as stub bodies — api/; small upload files — media/
 pages/       Page objects — locators and single actions only
 services/    Multi-step business workflows and API stubs
 utils/       Cross-cutting helpers and types

@@ -1,0 +1,264 @@
+{
+  "type": "regular",
+  "createQuery": "type=speaking",
+  "heading": "Create new question",
+  "headingSection": "speaking",
+  "backLabel": "Back To Question List",
+  "types": [
+    {
+      "code": "RA",
+      "id": "c7b24d80-1143-4ec2-9fb9-821d1b8aeeec",
+      "slug": "read-aloud",
+      "title": "Read Aloud",
+      "sampleAnswer": true,
+      "prompt": "Look at the text below. In 40 seconds, you must read this text aloud as naturally and clearly as possible. You have 40 seconds to read aloud.",
+      "videoPrompt": null,
+      "timing": {
+        "preparation_time": 40,
+        "preparation_time_pre_audio": 0,
+        "answer_time": 40,
+        "is_beep": true,
+        "answer_time_calculation_type": "pre_post_answer_time"
+      }
+    },
+    {
+      "code": "RS",
+      "id": "ef4b11a9-8086-4d93-8da7-4e68b60a6a0a",
+      "slug": "repeat-sentence",
+      "title": "Repeat Sentence",
+      "sampleAnswer": false,
+      "prompt": "You will hear a sentence. Please repeat the sentence exactly as you hear it. You will hear the sentence only once.",
+      "videoPrompt": null,
+      "timing": {
+        "preparation_time": 4,
+        "preparation_time_pre_audio": 3,
+        "answer_time": 15,
+        "is_beep": true,
+        "answer_time_calculation_type": "pre_post_file_length_answer_time"
+      }
+    },
+    {
+      "code": "DI",
+      "id": "7b0940dc-2d64-48dc-a9e1-b22de427e63e",
+      "slug": "describe-image",
+      "title": "Describe Image",
+      "sampleAnswer": true,
+      "prompt": "Look at the image below. In 25 seconds, please speak into the microphone and describe in detail what the image is showing. You will have 40 seconds to give your response.",
+      "videoPrompt": null,
+      "timing": {
+        "preparation_time": 25,
+        "preparation_time_pre_audio": 0,
+        "answer_time": 40,
+        "is_beep": true,
+        "answer_time_calculation_type": "pre_post_answer_time"
+      }
+    },
+    {
+      "code": "RL",
+      "id": "306d2f79-720e-4b12-acf2-439436844c67",
+      "slug": "retell-lecture",
+      "title": "Retell Lecture",
+      "sampleAnswer": true,
+      "prompt": "You will hear a lecture. After listening to the lecture, in 10 seconds, please speak into the microphone and retell what you have just heard from the lecture in your own words. You will have 40 seconds to give your response.",
+      "videoPrompt": "You will see a video. After watching the video, in 10 seconds, please speak into the microphone and retell what you have just heard from the video in your own words. You will have 40 seconds to give your response.",
+      "timing": {
+        "preparation_time": 10,
+        "preparation_time_pre_audio": 3,
+        "answer_time": 40,
+        "is_beep": true,
+        "answer_time_calculation_type": "pre_post_file_length_answer_time"
+      }
+    },
+    {
+      "code": "ASQ",
+      "id": "d95558f1-5063-4a3e-8980-ab2a8f632063",
+      "slug": "answer-short-question",
+      "title": "Answer Short Question",
+      "sampleAnswer": false,
+      "prompt": "You will hear a question. Please give a simple and short answer. Often just one or a few words is enough.",
+      "videoPrompt": null,
+      "timing": {
+        "preparation_time": 3,
+        "preparation_time_pre_audio": 3,
+        "answer_time": 15,
+        "is_beep": false,
+        "answer_time_calculation_type": "pre_post_file_length_answer_time"
+      }
+    },
+    {
+      "code": "SGD",
+      "id": "b48d6205-99b8-4200-92a2-c40ce1ba8ce7",
+      "slug": "summarize-group-discussion",
+      "title": "Summarize Group Discussion",
+      "sampleAnswer": true,
+      "prompt": "You will hear three people having a discussion. When you hear the beep, summarize the whole discussion. You will have 10 seconds to prepare and 2 minutes to give your response.",
+      "videoPrompt": null,
+      "timing": {
+        "preparation_time": 10,
+        "preparation_time_pre_audio": 3,
+        "answer_time": 120,
+        "is_beep": true,
+        "answer_time_calculation_type": "pre_post_file_length_answer_time"
+      }
+    },
+    {
+      "code": "RTAS",
+      "id": "fe321f11-df80-435b-927b-87608890db49",
+      "slug": "respond-to-a-situation",
+      "title": "Respond To A Situation",
+      "sampleAnswer": true,
+      "prompt": "Listen to and read a description of a situation. You will have 10 seconds to think about your answer. Then you will hear a beep. You will have 40 seconds to answer the question. Please answer as completely as you can.",
+      "videoPrompt": null,
+      "timing": {
+        "preparation_time": 10,
+        "preparation_time_pre_audio": 3,
+        "answer_time": 40,
+        "is_beep": true,
+        "answer_time_calculation_type": "pre_post_file_length_answer_time"
+      }
+    }
+  ],
+  "defaults": {
+    "source": "EXAM_QUESTION",
+    "sourceLabel": "Exam Question",
+    "frequency": "MODERATE",
+    "frequencyLabel": "Moderate"
+  },
+  "sourceOptions": [
+    { "id": "EXAM_QUESTION", "label": "Exam Question" },
+    { "id": "PRACTICE", "label": "Practice" }
+  ],
+  "frequencyOptions": [
+    { "id": "HIGH", "label": "High" },
+    { "id": "MODERATE", "label": "Moderate" },
+    { "id": "LOW", "label": "low" }
+  ],
+  "hiddenDefaults": {
+    "type": "QUESTION",
+    "prompt_type": "DEFAULT",
+    "answer_time_type": "DEFAULT",
+    "preparation_time_type": "DEFAULT",
+    "is_requested": false
+  },
+  "absentFromPayload": ["question_options", "explanations", "sample_answers"],
+  "approveStatus": 1,
+  "qIdPattern": "^RA\\d+$",
+  "messages": {
+    "created": "Question created successfully",
+    "indexRequired": "Index Field is required",
+    "indexTaken": "The index has already been taken.",
+    "sourceRequired": "Field is required",
+    "titleRequired": "Title Field is required",
+    "transcriptRequired": "Transcript Field is required",
+    "imageRequired": "Image Field is required",
+    "filePathRequired": "The file path field is required.",
+    "keywordHint": "Separate the keywords with semicolons (;).",
+    "bracketHint": "Use brackets to mark keywords: [word] = Keywords",
+    "saved": "Successfully Saved",
+    "invalidSampleAnswer": "Invalid Sample Answer ID: "
+  },
+  "upload": {
+    "audioType": "question_audio",
+    "imageType": "question_images",
+    "videoType": "online_class_video",
+    "accept": { "audio": "audio/*", "image": "image/*", "video": "video/*" },
+    "audioUrlPattern": "^https://[^/]+\\.digitaloceanspaces\\.com/apical/question/audio/\\d{4}/",
+    "httpsUrlPattern": "^https://"
+  },
+  "mediaSeconds": {
+    "speaking-short.mp3": 5,
+    "speaking-short-2.mp3": 4,
+    "speaking-lecture.mp3": 60,
+    "speaking-discussion.mp3": 180,
+    "speaking-lecture.mp4": 20
+  },
+  "content": {
+    "RA": {
+      "title": "<p><strong>[Domestication]</strong> is an [evolutionary] process that has shaped many species.</p>",
+      "keywords": "Domestication;evolutionary",
+      "plainTitle": "A passage to read aloud with no keyword marks."
+    },
+    "RS": {
+      "transcript": "<p>The [government] is taking [steps] to penalise late payments.</p>",
+      "keywords": "government;steps"
+    },
+    "DI": {
+      "keywords": "graph;proportion of Australians",
+      "literalKeyword": "[x]"
+    },
+    "RL": {
+      "transcript": "<p>The lecture describes the [enormous rise] of urban populations.</p>",
+      "keywords": "enormous rise"
+    },
+    "ASQ": {
+      "transcript": "<p>What do we call the [pair of objects] used to play dice?</p>",
+      "keywords": "pair of objects",
+      "plainTranscript": "<p>What do we roll in a board game?</p>",
+      "manualKeyword": "dice"
+    },
+    "SGD": {
+      "transcript": "<p>Three students discuss the [accommodation office] and its opening hours.</p>",
+      "keywords": "accommodation office"
+    },
+    "RTAS": {
+      "transcript": "<p>You booked a [meeting room] at the library, but it is already taken.</p>",
+      "keywords": "meeting room"
+    }
+  },
+  "keywordCases": {
+    "single": {
+      "text": "<p>The [government] is taking [steps]</p>",
+      "expected": "government;steps"
+    },
+    "multiWord": {
+      "text": "<p>[Scientists are hoping] to measure</p>",
+      "contains": "Scientists are hoping"
+    },
+    "specialCharacters": {
+      "text": "<p>[well-known!]</p>",
+      "expected": "wellknown"
+    },
+    "duplicates": { "text": "<p>[cat] and [cat]</p>", "expected": "cat" },
+    "manualKept": {
+      "manual": "manual",
+      "text": "<p>[auto]</p>",
+      "expected": "manual;auto"
+    },
+    "doubleBrackets": {
+      "text": "<p>[[content]] and [vocab]</p>",
+      "expected": "vocab"
+    },
+    "removeKeyword": {
+      "text": "<p>The [government] is [taking]</p>",
+      "synced": "government;taking",
+      "after": "government",
+      "expectedText": "The [government] is taking"
+    },
+    "removeBrackets": {
+      "text": "<p>[government]</p>",
+      "edited": "<p>government</p>",
+      "expected": "government"
+    },
+    "savedVerbatim": {
+      "manual": "c",
+      "text": "<p>[a] [b]</p>",
+      "expected": "c;a;b"
+    }
+  },
+  "statusLabels": { "published": "Published", "draft": "Draft" },
+  "frequencyColour": {
+    "HIGH": "text-success",
+    "MODERATE": "text-tahiti-gold",
+    "LOW": "text-gray-500"
+  },
+  "sampleAnswerDialog": {
+    "heading": "Create Sample Answer",
+    "chip": "SPEAKING",
+    "createNew": "Create New",
+    "archive": "Choose From Archive",
+    "set": "SET",
+    "saveAndSet": "Save & SET"
+  },
+  "longTitleLength": 1500,
+  "otherSections": ["reading", "writing"]
+}

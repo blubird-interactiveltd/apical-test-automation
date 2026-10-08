@@ -1,0 +1,67 @@
+{
+  "type": "edge",
+  "whitespaceIndex": "   ",
+  "maxIndexLength": 255,
+  "unicodeIndexSuffix": "-অ-測試-#1",
+  "whitespaceTitle": "<p>&nbsp; &nbsp;</p>",
+  "richTitle": {
+    "html": "<p><strong>Bold words</strong> then <i>italic words</i><br>and a second line.</p>",
+    "bold": "Bold words",
+    "italic": "italic words"
+  },
+  "serverError": { "status": 500, "body": { "message": "Server Error" } },
+  "slowUploadMs": 5000,
+  "uploadForbidden": {
+    "status": 403,
+    "body": { "message": "Permission is inactive or does not exist." }
+  },
+  "bigAudio": {
+    "fileName": "big-audio.mp3",
+    "mimeType": "audio/mpeg",
+    "status": 422,
+    "body": {
+      "message": "The audio must not be greater than 100 MB.",
+      "errors": { "file": ["The audio must not be greater than 100 MB."] },
+      "status": "error"
+    }
+  },
+  "bigImage": {
+    "fileName": "big-image.png",
+    "mimeType": "image/png",
+    "status": 422,
+    "body": {
+      "message": "The image must not be greater than 10 MB.",
+      "errors": { "file": ["The image must not be greater than 10 MB."] },
+      "status": "error"
+    }
+  },
+  "stubbedSampleAnswer": {
+    "id": "00000000-0000-4000-8000-000000000807",
+    "fileUrl": "https://stub.invalid/apical/question/audio/2026/sample-answer.mp3",
+    "questionId": "00000000-0000-4000-8000-000000000802"
+  },
+  "invalidType": {
+    "audio": "The file must be a valid audio type (mp3, wav, aac, flac).",
+    "image": "The file must be a valid image type (jpeg, png, jpg, gif, webp).",
+    "video": "The file must be a valid video type (mp4, webm, avi, mov, flv, 3gp, m4v).",
+    "generic": "Unsupported file type."
+  },
+  "api": {
+    "missingKeys": ["active", "prompt_type", "is_requested", "answer_time"],
+    "badEnums": [
+      { "key": "source", "value": "X" },
+      { "key": "frequency", "value": "X" },
+      { "key": "file_type", "value": "pdf" },
+      { "key": "prompt_type", "value": "X" }
+    ],
+    "nonUrlFilePath": "not a url",
+    "errorMessage": "The given data was invalid.",
+    "errorStatus": "error",
+    "leakMarkers": ["trace", "exception", "SQLSTATE", "/var/www"],
+    "permissionMessages": [
+      "Permission is inactive or does not exist.",
+      "Unauthorized: Role or Permission is inactive.",
+      "This action is unauthorized."
+    ]
+  }
+}

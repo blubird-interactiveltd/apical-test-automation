@@ -1,0 +1,125 @@
+{
+  "type": "regular",
+  "recordedOn": "2026-10-05",
+  "total": 118,
+  "perPage": 20,
+  "headers": [
+    "SL",
+    "Q_ID",
+    "INDEX",
+    "ITEM",
+    "FREQUENCY",
+    "CREATED AT",
+    "CREATED BY",
+    "STATUS",
+    "ACTIONS"
+  ],
+  "tabs": ["Speaking", "Writing", "Reading", "Listening"],
+  "initialQuery": {
+    "type": "question",
+    "section": "speaking",
+    "sort": "-created_at"
+  },
+  "types": [
+    {
+      "code": "RA",
+      "title": "Read Aloud",
+      "id": "c7b24d80-1143-4ec2-9fb9-821d1b8aeeec",
+      "count": 37
+    },
+    {
+      "code": "RS",
+      "title": "Repeat Sentence",
+      "id": "ef4b11a9-8086-4d93-8da7-4e68b60a6a0a",
+      "count": 21
+    },
+    {
+      "code": "DI",
+      "title": "Describe Image",
+      "id": "7b0940dc-2d64-48dc-a9e1-b22de427e63e",
+      "count": 17
+    },
+    {
+      "code": "RL",
+      "title": "Retell Lecture",
+      "id": "306d2f79-720e-4b12-acf2-439436844c67",
+      "count": 16
+    },
+    {
+      "code": "ASQ",
+      "title": "Answer Short Question",
+      "id": "d95558f1-5063-4a3e-8980-ab2a8f632063",
+      "count": 10
+    },
+    {
+      "code": "SGD",
+      "title": "Summarize Group Discussion",
+      "id": "b48d6205-99b8-4200-92a2-c40ce1ba8ce7",
+      "count": 9
+    },
+    {
+      "code": "RTAS",
+      "title": "Respond To A Situation",
+      "id": "fe321f11-df80-435b-927b-87608890db49",
+      "count": 8
+    }
+  ],
+  "allTypeLabel": "All Type",
+  "statuses": ["All", "Draft", "Published"],
+  "draftCount": 8,
+  "repeatSentenceDraftCount": 7,
+  "newest": {
+    "qId": "RS00237",
+    "index": "RS0001-6",
+    "createdAt": "02 Oct, 2026 01:07 pm"
+  },
+  "oldest": { "qId": "DI011", "createdAt": "17 Sep, 2025 09:28 pm" },
+  "withCreator": {
+    "qId": "RA00236",
+    "creator": "a64412c0-1dc8-4f70-a4ef-20f53363bbac"
+  },
+  "withoutCreator": { "qId": "RS00237", "createdBy": "Blubird" },
+  "frequencyColour": {
+    "HIGH": "text-success",
+    "MODERATE": "text-tahiti-gold",
+    "LOW": "text-gray-500"
+  },
+  "statusLabel": {
+    "published": { "text": "Published", "class": "text-green" },
+    "draft": { "text": "Draft", "class": "text-red" }
+  },
+  "search": {
+    "placeholder": "Search speaking questions",
+    "qIdTerm": "RS0001",
+    "qIdTermMatches": 5,
+    "fullIndex": {
+      "term": "April RL Nutrition Science and Food Guidance",
+      "qId": "RL00225"
+    },
+    "shortTerms": ["R", "S"],
+    "noMatch": "zz-no-such-question-zz",
+    "combined": {
+      "typeCode": "RL",
+      "status": "Published",
+      "term": "lecture",
+      "matches": 1
+    },
+    "pageResetTerm": "RS0001"
+  },
+  "pagination": {
+    "firstLabel": "1 - 20 Of 118",
+    "secondLabel": "21 - 40 Of 118",
+    "lastLabel": "101 - 118 Of 118",
+    "lastPage": 6,
+    "lastPageRows": 18,
+    "singlePageType": "RTAS",
+    "singlePageLabel": "1 - 8 Of 8",
+    "emptyLabel": "0 - 0 Of 0"
+  },
+  "permissionIds": {
+    "QUESTION_STORE": 101205,
+    "QUESTION_SHOW": 101206,
+    "QUESTION_UPDATE": 101207,
+    "QUESTION_DESTROY": 101208
+  }
+}
